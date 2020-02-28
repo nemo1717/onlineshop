@@ -1,0 +1,74 @@
+<link rel="stylesheet" type="text/css" href="/css/styla.css" />
+
+<% include ./navy %>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+<div class="s-layout">
+        
+        <!-- Content -->
+        <main class="s-layout__content">
+          
+<div class="section-form">
+
+  <% include ./partials/messages %>
+                              
+    <% if ( success_messages !='' ) { %>
+      <div class="alert alert-success" >
+          <strong><%= success_messages %> </strong>
+      </div>
+      <% } %>
+   
+        <form method="post" action="/sales">
+          <div class="intro"> 
+            <h1>Add Product Sales</h1>
+          
+          </div>
+
+          <select id="pname" class = "select" name = "pname" type = "text"  required = "required">
+            <option value = "" disabled selected>Select Product</option>
+            <% data.forEach(function(item) { %>
+            <option > <%= item.prod_name %></option>
+            <% }); %>  
+          </select>
+
+          <input id = "date" type="date" value="" placeholder="Date" name="date" tabindex="1" required/>
+
+     
+
+          <input id="price" type="number" placeholder="Unit Price Paid" name="price" tabindex="3" required/>
+          <input id="quant" type="number"  placeholder="Quantity Bought" name="quant" tabindex="3" required/>
+
+          <select id="cust" class = "select" name = "cust" type = "text" > 
+          <optgroup>
+            <option value = "" disabled selected>Select Customer</option>
+           <% datum.forEach(function(item) { %>
+           <option > <%= item.Name %></option>
+           <% }); %>  
+          </optgroup>
+        </select>
+
+          <textarea id="comment" placeholder="Comments" name="description" tabindex="5" rows="10"></textarea>
+          <button type="submit" id = "register" value = "register" class="btn btn-primary btn-block">Submit</button>
+        </form>
+       
+      </div>
+        </main>
+        </div>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+<script>
+
+  /*
+$('#pname, #price, #quant').bind('change', function() {
+    if(allFilled()) $('#register').removeAttr('disabled');
+    else{$('#register').prop("disabled", true);}
+});
+
+function allFilled() {
+    var filled = true;
+    $('body input').each(function() {
+        if($(this).val() == '') filled = false;
+    });
+    return filled;
+}
+*/
+</script>

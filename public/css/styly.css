@@ -1,0 +1,650 @@
+body{
+  font-family: Circular,Helvetica,Arial,sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 0;
+  margin: 0;
+  background-color: #ffffffa2;
+}
+
+/* Global */
+.container{
+  width: 80%;
+  margin:auto;
+  overflow:auto;
+}
+
+ul{
+  margin: 0;
+  padding: 0;
+
+}
+
+.button_1{
+  height:38px;
+  background:#e8491d;
+  border:0;
+  padding-left: 20px;
+  padding-right:20px;
+  color:#ffffff;
+}
+
+/*header*/
+
+header{
+  background: #ffffff;
+  color: #ffffff;
+  padding-top: 30px;
+  min-height: 70px;
+  font-family: Circular,Helvetica,Arial,sans-serif;
+color: #484848;
+background-color: #fff;
+border: 1px solid #DCE0E0;
+}
+
+header a{
+  color: #000000;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+
+
+header li{
+  float:left;
+  display: inline;
+  padding: 0 20px 0 20px;
+
+}
+
+header #branding{
+  float: left;
+
+}
+
+header #branding{
+  margin: 0;
+
+}
+
+header nav{
+  float: center;
+  margin-top: 35px;
+}
+
+header .highlight, header .current a{
+  color: #e8491d;
+  font-weight: bold;
+}
+
+header a:hover{
+  color: #cccccc;
+  font-weight: bold;
+}
+
+
+.topnav {
+overflow: hidden;
+background-color: #333;
+}
+
+.topnav a {
+float: left;
+display: block;
+color: #f2f2f2;
+text-align: center;
+padding: 14px 16px;
+text-decoration: none;
+font-size: 17px;
+}
+
+.active {
+background-color: #4CAF50;
+color: white;
+}
+
+.topnav .icon {
+display: none;
+}
+
+.dropdown {
+float: left;
+overflow: hidden;
+}
+
+.dropdown .dropbtn {
+font-size: 17px;    
+border: none;
+outline: none;
+color: white;
+padding: 14px 16px;
+background-color: inherit;
+font-family: inherit;
+margin: 0;
+}
+
+.dropdown-content {
+display: none;
+position: absolute;
+background-color: #f9f9f9;
+min-width: 160px;
+box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+z-index: 1;
+}
+
+.dropdown-content a {
+float: none;
+color: black;
+padding: 12px 16px;
+text-decoration: none;
+display: block;
+text-align: left;
+}
+
+.topnav a:hover, .dropdown:hover .dropbtn {
+background-color: #555;
+color: white;
+}
+
+.dropdown-content a:hover {
+background-color: #ddd;
+color: black;
+}
+
+.dropdown:hover .dropdown-content {
+display: block;
+}
+
+@media screen and (max-width: 600px) {
+.topnav a:not(:first-child), .dropdown .dropbtn {
+  display: none;
+}
+.topnav a.icon {
+  float: right;
+  display: block;
+}
+}
+
+@media screen and (max-width: 600px) {
+.topnav.responsive {position: relative;}
+.topnav.responsive .icon {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.topnav.responsive a {
+  float: none;
+  display: block;
+  text-align: left;
+}
+.topnav.responsive .dropdown {float: none;}
+.topnav.responsive .dropdown-content {position: relative;}
+.topnav.responsive .dropdown .dropbtn {
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+}
+
+
+/* showcase */
+
+#showcase{
+  min-height: 400px;
+  background: url('../pages.jpg') no-repeat 0  ;
+  text-align: center;
+  color: #ffffff;
+  background-position: center;
+  background-size: cover;
+  margin-top: 50px;
+}
+#showcase h1{
+  margin-top: 100px;
+  font-size: 55px;
+  margin-bottom: 10px;
+}
+
+#showcase p{
+  font-size: 20px;
+}
+
+#newsletter{
+  padding:15px;
+  color:#ffffff;
+  background:#35424a;
+  margin-top: 50px;
+  text-align: center;
+}
+
+#newsletter h4{
+
+  height: 28px;
+
+}
+
+#newsletter form {
+  float:center;
+  margin-top:20px;
+}
+
+
+#newsletter input[type=text] {
+  width: 250px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: white;
+  background-image: url('searchicon.png');
+  background-position: 10px 10px; 
+  background-repeat: no-repeat;
+  padding: 12px 20px 12px 40px;
+  -webkit-transition: width 0.3s ease-in-out;
+  transition: width 0.3s ease-in-out;
+}
+
+#newsletter input[type=text]:focus {
+  width: 170%;
+}
+
+#newsletter input::placeholder {
+  color: rgb(0, 0, 0);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  
+}
+
+#newsletter input[type="submit"] {
+  border-radius: 2px;
+  background: #f2f2f2;
+  border: 1px solid #f2f2f2;
+  color: #757575;
+  cursor: default;
+  font-size: 14px;
+  font-weight: bold;
+  width: 100px;
+  padding: 0 16px;
+  height:50px;
+}
+#newsletter input[type="submit"]:hover {
+  box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  background: #f8f8f8;
+  border: 1px solid #c6c6c6;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  color: #222;
+}
+
+/* Plces Prices*/
+
+.prices{
+  width: 100%;
+  margin:auto;
+  margin-top: 50px;
+  overflow: hidden;
+  
+  border: #43A047;
+}
+
+.price:after {
+content: "";
+display: inline-block;
+width: 100%;
+}
+.prices h4{
+  font-weight: 100;
+  font-size: 25px;
+  color: #484848;
+      margin-left: 5px;
+      text-align:center;
+}
+
+.img{
+  width: 80%;
+  margin:auto;
+  margin-top: 50px;
+  overflow: hidden;
+  border: 2px solid rgb(218, 215, 215);
+  background-color: #f7f7f7;
+  border-radius: 25px;
+  
+
+}
+
+
+  
+
+  .description{
+
+  color: #484848;
+  float: left;
+  margin:auto;
+  overflow: hidden;
+  margin-top: 1%;
+  width: 70%;
+  word-wrap: break-word;
+
+
+ 
+
+  }
+
+  .description h3{
+      color: #484848;
+      float: right;
+      overflow: hidden;
+      font-family: "Century Gothic", CenturyGothic, Geneva, AppleGothic, sans-serif;
+      font-size: 15px;
+      margin-left: 1px;
+      }
+
+
+
+
+  .gallery h5{
+    font-weight: 100;
+    font-size: 15px;
+    font-weight: bold;  
+    color: #484848;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+    
+  }
+
+  .gallery h6{
+    font-weight: 500;
+    font-size: 14px;     
+    color: #484848;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-left: 400px;
+   
+    
+  }
+
+  .gallery h2{
+    font-weight: 100;
+    font-size: 17px;
+    font-weight: bold;
+    font-family: "Lucida Sans Typewriter", "Lucida Console", Monaco, "Bitstream Vera Sans Mono", monospace;
+    color: #484848;
+    margin-left: 400px;
+    
+  }
+  
+  hr{
+      border: 0;
+      height: 1px;
+      background: #DCE0E0;
+          margin-bottom: 55px;
+  }
+
+  /* footer*/
+  
+  footer{
+      padding:20px;
+      margin-top:20px;
+      color:#ffffff;
+      background-color:#e8491d;
+      text-align: center;
+    }
+
+
+    /* Insert Form */
+
+    @import url(https://fonts.googleapis.com/css?family=Roboto:400,300,600,400italic);
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+-webkit-font-smoothing: antialiased;
+-moz-font-smoothing: antialiased;
+-o-font-smoothing: antialiased;
+text-rendering: optimizeLegibility;
+}
+
+
+
+#contact input[type="text"],
+#contact input[type="email"],
+#contact input[type="tel"],
+#contact input[type="url"],
+#contact textarea,
+#contact button[type="submit"] {
+font: 400 12px/16px "Roboto", Helvetica, Arial, sans-serif;
+}
+
+#contact {
+background: #F9F9F9;
+padding: 25px;
+
+box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+
+width: 30%;
+  height: 70%;
+  overflow: auto;
+  margin: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+
+}
+
+#contact h3 {
+display: block;
+font-size: 14px;
+font-weight: 300;
+margin-bottom: 10px;
+
+
+}
+
+#contact h4 {
+margin: 5px 0 15px;
+display: block;
+font-size: 16px;
+font-weight: 600;
+text-align: center;
+color: rgb(4, 66, 6);
+}
+
+fieldset {
+border: medium none !important;
+margin: 0 0 10px;
+min-width: 100%;
+padding: 0;
+width: 100%;
+}
+
+#contact input[type="text"],
+#contact input[type="email"],
+#contact input[type="tel"],
+#contact input[type="url"],
+#contact textarea {
+width: 100%;
+border: 1px solid #ccc;
+background: #FFF;
+margin: 0 0 5px;
+padding: 10px;
+}
+
+#contact input[type="text"]:hover,
+#contact input[type="email"]:hover,
+#contact input[type="tel"]:hover,
+#contact input[type="url"]:hover,
+#contact textarea:hover {
+-webkit-transition: border-color 0.3s ease-in-out;
+-moz-transition: border-color 0.3s ease-in-out;
+transition: border-color 0.3s ease-in-out;
+border: 1px solid #aaa;
+}
+
+#contact textarea {
+height: 200px;
+max-width: 100%;
+resize: none;
+}
+
+#contact button[type="submit"] {
+cursor: pointer;
+width: 100%;
+border: none;
+background: #4CAF50;
+color: #FFF;
+margin: 0 0 5px;
+padding: 10px;
+font-size: 15px;
+}
+
+#contact button[type="submit"]:hover {
+background: #43A047;
+-webkit-transition: background 0.3s ease-in-out;
+-moz-transition: background 0.3s ease-in-out;
+transition: background-color 0.3s ease-in-out;
+}
+
+#contact button[type="submit"]:active {
+box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.copyright {
+text-align: center;
+}
+
+#contact input:focus,
+#contact textarea:focus {
+outline: 0;
+border: 1px solid #aaa;
+}
+
+::-webkit-input-placeholder {
+color: #888;
+}
+
+:-moz-placeholder {
+color: #888;
+}
+
+::-moz-placeholder {
+color: #888;
+}
+
+:-ms-input-placeholder {
+color: #888;
+}
+
+/* table  */
+
+.rtable {
+  /*!
+  // IE needs inline-block to position scrolling shadows otherwise use:
+  // display: block;
+  // max-width: min-content;
+  */
+
+  vertical-align: top;
+  max-width: 100%;
+  overflow-x: auto;
+  margin:auto;
+  margin-top: 10px; 
+  white-space: nowrap;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.rtable,
+.rtable--flip tbody {
+ 
+  -webkit-overflow-scrolling: touch;
+  
+
+  background: radial-gradient(left, ellipse, rgba(0,0,0, .2) 0%, rgba(0,0,0, 0) 75%) 0 center,
+              radial-gradient(right, ellipse, rgba(0,0,0, .2) 0%, rgba(0,0,0, 0) 75%) 100% center;
+  background-size: 10px 100%, 10px 100%;
+  background-attachment: scroll, scroll;
+  background-repeat: no-repeat;
+}
+
+
+.rtable td:first-child,
+.rtable--flip tbody tr:first-child {
+  background-image: linear-gradient(to right, rgba(255,255,255, 1) 50%, rgba(255,255,255, 0) 100%);
+  background-repeat: no-repeat;
+  background-size: 20px 100%;
+}
+
+
+.rtable td:last-child,
+.rtable--flip tbody tr:last-child {
+  background-image: linear-gradient(to left, rgba(255,255,255, 1) 50%, rgba(255,255,255, 0) 100%);
+  background-repeat: no-repeat;
+  background-position: 100% 0;
+  background-size: 20px 100%;
+}
+
+.rtable th {
+  font-size: 11px;
+  text-align: left;
+  text-transform: uppercase;
+  background: #f2f0e6;
+}
+
+.rtable th,
+.rtable td {
+  padding: 6px 12px;
+  border: 1px solid #d9d7ce;
+}
+
+.rtable--flip {
+  display: flex;
+  overflow: hidden;
+  background: none;
+}
+
+.rtable--flip thead {
+  display: flex;
+  flex-shrink: 0;
+  min-width: min-content;
+}
+
+.rtable--flip tbody {
+  display: flex;
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.rtable--flip tr {
+  display: flex;
+  flex-direction: column;
+  min-width: min-content;
+  flex-shrink: 0;
+}
+
+.rtable--flip td,
+.rtable--flip th {
+  display: block;
+}
+
+.rtable--flip td {
+  background-image: none !important;
+  border-left: 0;
+}
+
+
+.rtable--flip th:not(:last-child),
+.rtable--flip td:not(:last-child) {
+  border-bottom: 0;
+}
+
+/*!
+// CodePen house keeping
+*/
+
+code {
+  background: #fffbcc;
+  font-size: 12px;
+}
+
+span {
+  content: "\20A6";
+}
+

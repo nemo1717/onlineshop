@@ -1,0 +1,191 @@
+<link rel="stylesheet" type="text/css" href="/css/styla.css" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<div class="s-layout">
+        <!-- Sidebar -->
+        <div class="s-layout__sidebar">
+          <a class="s-sidebar__trigger" href="#0">
+             <i class="fa fa-bars"></i>
+          </a>     
+          <nav class="s-sidebar__nav">          
+             <ul>
+                    <li>
+                            <a class="s-sidebar__nav-link" href="#0">
+                               <i class="fa fa-home"></i><em>Layan CRM</em>
+                            </a>
+                        </li>
+                        <a class="s-sidebar__nav-link" href="#0">
+                        <div class="user-pic">
+                                <img class="img-responsive img-rounded" src="https://raw.githubusercontent.com/azouaoui-med/pro-sidebar-template/gh-pages/src/img/user.jpg"
+                                alt="User picture">
+                              </div>
+                              <div class="user-info">
+                                <span class="user-name">Jhon
+                                  <strong>Smith</strong>
+                                </span>
+                                <span class="user-role">Administrator</span>
+                                <span class="user-status">
+                                  <i class="fa fa-circle"></i>
+                                  <span>Online</span>
+                                </span>
+                              </div>
+                        </a>
+                <li>
+                   <a class="s-sidebar__nav-link" href="#0">
+                      <i class="fa fa-home"></i><em>Home</em>
+                   </a>
+                </li>
+                <li>
+                   <a class="s-sidebar__nav-link" href="#0">
+                     <i class="fa fa-user"></i><em>My Profile</em>
+                   </a>
+                </li>
+                <li>
+                   <a class="s-sidebar__nav-link" href="#0">
+                      <i class="fa fa-camera"></i><em>Camera</em>
+                   </a>
+                </li>
+             </ul>
+          </nav>
+        </div>
+        
+        <!-- Content -->
+        <section class="gallery">	
+
+        <div class="gallery-places">
+
+
+          <% produc.forEach(function(item) { %>
+            <option > <%= item.prod_name %></option>
+            <% }); %>  
+
+     
+
+
+		
+         <h3>Explore Minnesota Popular Cities</h3>
+         
+         <div class="places">
+
+          <a style="display: block;" href="">
+            <div class="img-large">
+              <div id="chart" style="width: 100%"></div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="https://www.google.com/jsapi"></script>
+
+<script>
+
+// 3. This function fires when Google Charts has been fully loaded
+function drawChart() {
+
+  // 4. Retrieve the raw JSON data
+  var jsonData = $.ajax({
+    url: 'http://localhost:3000/getme.json',
+    dataType: 'json',
+  }).done(function (results) {
+
+    // 5. Create a new DataTable (Charts expects data in this format)
+    var data = new google.visualization.DataTable();
+
+    // 6. Add two columns to the DataTable
+    data.addColumn('datetime', 'Time');
+    data.addColumn('number',   'Temp');
+
+    // 7. Cycle through the records, adding one row per record
+    for (var i = 0; i < results.length; i++) {
+      data.addRow([results[i].prod_id, results[i].prod_name]);
+            }
+
+    // 8. Create a new line chart
+    var chart = new google.visualization.LineChart($('#chart').get(0));
+
+    // 9. Render the chart, passing in our DataTable and any config data
+    chart.draw(data, {
+      title:  'Ambient Temperature (/test/temp)',
+      height: 150
+    });
+
+  });
+
+}
+
+// 1. Start loading Google Charts
+google.load('visualization', '1', {
+  packages: ['corechart']
+});
+
+// 2. Set a callback function to fire when loading is complete
+google.setOnLoadCallback(drawChart);
+
+</script>
+
+            </div>
+        </a>
+
+             
+         <a style="display: block;" href="">
+             <div class="img-large">
+
+              <body>
+                <!--Div that will hold the pie chart-->
+                <div id="piechart_3d"></div>
+              </body>
+  
+              <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+              <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+              <script type="text/javascript">
+
+function drawChart () {
+
+
+    $.ajax({
+        url: "fada.json",
+        dataType: "json",
+        success: function (jsonData) {
+            var data = new google.visualization.DataTable();
+            // assumes "word" is a string and "count" is a number
+            data.addColumn('string', 'word');
+            data.addColumn('number', 'count');
+
+            for (var i = 0; i < jsonData.length; i++) {
+                data.addRow([jsonData[i].prod_name, jsonData[i].prod_id]);
+            }
+
+            var options = {
+                title: 'Certificate details',
+                is3D: true
+            };
+            var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+            chart.draw(data, options);
+        }
+    });
+}
+
+          
+              </script>
+           
+          
+
+
+
+             </div>
+         </a>
+
+
+
+         
+             
+
+         
+
+             
+ 
+         </div>
+         
+     </div>
+
+        </section>
+        </div>

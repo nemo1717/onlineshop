@@ -1,0 +1,84 @@
+<link rel="stylesheet" type="text/css" href="/css/styla.css" />
+
+<% include ./navy %>
+
+<div class="s-layout">
+        <!-- Sidebar -->
+        <div class="s-layout__sidebar">
+          <a class="s-sidebar__trigger" href="#0">
+             <i class="fa fa-bars"></i>
+          </a>     
+          <nav class="s-sidebar__nav">          
+             <ul>
+                    <li>
+                            <a class="s-sidebar__nav-link" href="#0">
+                               <i class="fa fa-home"></i><em>Layan CRM</em>
+                            </a>
+                        </li>
+                        <a class="s-sidebar__nav-link" href="#0">
+                        <div class="user-pic">
+                                <img class="img-responsive img-rounded" src="https://raw.githubusercontent.com/azouaoui-med/pro-sidebar-template/gh-pages/src/img/user.jpg"
+                                alt="User picture">
+                              </div>
+                              <div class="user-info">
+                                <span class="user-name">Jhon
+                                  <strong>Smith</strong>
+                                </span>
+                                <span class="user-role">Administrator</span>
+                                <span class="user-status">
+                                  <i class="fa fa-circle"></i>
+                                  <span>Online</span>
+                                </span>
+                              </div>
+                        </a>
+                <li>
+                   <a class="s-sidebar__nav-link" href="#0">
+                      <i class="fa fa-home"></i><em>Home</em>
+                   </a>
+                </li>
+                <li>
+                   <a class="s-sidebar__nav-link" href="#0">
+                     <i class="fa fa-user"></i><em>My Profile</em>
+                   </a>
+                </li>
+                <li>
+                   <a class="s-sidebar__nav-link" href="#0">
+                      <i class="fa fa-camera"></i><em>Camera</em>
+                   </a>
+                </li>
+             </ul>
+          </nav>
+        </div>
+        
+        <!-- Content -->
+        <main class="s-layout__content">
+
+     
+          
+<div class="section-form">
+  <% include ./partials/messages %>
+                              
+  <% if ( success_messages !='' ) { %>
+    <div class="alert alert-success" >
+        <strong><%= success_messages %> </strong>
+    </div>
+    <% } %>
+
+        <form  action="/expenses" method="post">
+          <div class="intro"> 
+            <h1>Add Expenses</h1>
+          </div>
+          <input type="date" value="" placeholder="Date" name="date" required/>
+          <input type="number" value="" placeholder="Shop Expenses" name="shop_exp" />
+          <input type="number"value="" placeholder="Product Transport" name="prod_transp"  />
+          <input type="number" value="" placeholder="School Fees" name="sch_fee" />
+          <input type="number" value="" placeholder="Contribution" name="contri" />
+          <input type="number" value="" placeholder="Paybacks" name="cop" />
+          <input type="number"value="" placeholder="Household" name="hhold" />
+          <input type="number" value="" placeholder="Salary" name="sal" />
+          <input type="number" value="" placeholder="Others" name="others" />
+          <button type="submit" class="btn btn-primary btn-block">Submit Product</button>
+        </form>
+      </div>
+        </main>
+        </div>

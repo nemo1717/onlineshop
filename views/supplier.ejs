@@ -1,0 +1,37 @@
+<link rel="stylesheet" type="text/css" href="/css/styla.css" />
+
+<% include ./navy %>
+
+<div class="s-layout">
+
+        
+        <!-- Content -->
+        <main class="s-layout__content">
+          
+<div class="section-form">
+
+    <% include ./partials/messages %>
+                              
+    <% if ( success_messages !='' ) { %>
+      <div class="alert alert-success" >
+          <strong><%= success_messages %> </strong>
+      </div>
+      <% } %>
+
+        <form method="post" action="/supplier">
+          <div class="intro"> 
+            <h1>Add Supplier</h1>
+          </div>
+          <input type="text" value="" placeholder="Supplier Name " name="name" required/>
+          <input type="text" value="" placeholder="Phone Number" name="pno" />
+          <input type="text" value="" placeholder="Email" name="email" />
+          <input type="text" value="" placeholder="Address" name="addy" />
+          <input type="text" value="" placeholder="City" name="city" />
+          <input type="text" value="" placeholder="State" name="state" />
+          <input type="text" value="" placeholder="Country" name="country" />
+          <textarea placeholder="Comments" name="description"  rows="10"></textarea>
+          <button type="submit" class="btn btn-primary btn-block">Submit</button>
+        </form>
+      </div>
+    </main>
+</div>

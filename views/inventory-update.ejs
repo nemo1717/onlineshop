@@ -1,0 +1,74 @@
+<link rel="stylesheet" type="text/css" href="/css/styla.css" />
+
+<% include ./navy %>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+<div class="s-layout">
+        
+        <!-- Content -->
+        <main class="s-layout__content">
+          
+<div class="section-form">
+
+  <% include ./partials/messages %>
+                              
+    <% if ( success_messages !='' ) { %>
+      <div class="alert alert-success" >
+          <strong><%= success_messages %> </strong>
+      </div>
+      <% } %>
+   
+        <form method="post" action="/inventory-update" >
+          <div class="intro"> 
+            <h1>Update Product</h1>
+          
+          </div>
+
+          <select id="pname" class = "select" name = "pname" type = "text"  required="required" >
+          <option value = "" disabled selected>Select Product</option>
+          <% data.forEach(function(item) { %>
+          <option > <%= item.prod_name %></option>
+          <% }); %>  
+        </select>
+
+          <input id = "date" type="date" value="" placeholder="Date" name="date"  required/>
+
+          <input id="quant" type="number"  placeholder="Quantity Bought" name="quant" required/>
+
+
+          <select id="sup" class = "select" name = "sup" type = "text" >
+            <optgroup>
+              <option value = "" disabled selected>Select Supplier</option>
+                <% datum.forEach(function(item) { %>
+                  <option > <%= item.sup_name %></option>
+                <% }); %>  
+            </optgroup>
+        </select>
+
+        <textarea id="comment" placeholder="Comments" name="description"  rows="10"></textarea>
+        
+        <button type="submit" id = "register" value = "register"  class="btn btn-primary btn-block">Submit</button>
+        </form>
+       
+      </div>
+        </main>
+        </div>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+
+
+
+<script>
+  /*
+  function checkforblank() {
+    
+    var location = document.getElementById('pnames');
+    var invalid = pname.value == "Please Select";
+ 
+    if (invalid) {
+        alert('Please Select Product');
+        location.className = 'error';
+    }
+    return !invalid;
+}
+*/
+</script>

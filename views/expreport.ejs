@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="/css/styly.css" />
+	<title>Document</title>
+</head>
+<body>
+
+<% include ./nav %>
+<br>
+<br>
+<br>
+
+
+<style>
+
+h1{
+	text-align: center;
+	color: green;
+	font-size: 20px
+}
+
+</style>
+
+<h1> All Expenses</h1>	
+<table class="rtable">
+    <thead>
+      <tr>
+			<th>Date</th>
+        <th>Shop Expenses</th>
+        <th>Good Transport</th>
+        <th>School Fees</th>
+        <th>Normal Contribution</th>
+        <th>Coperative Contribution</th>
+        <th>Household</th>
+        <th>Salary</th>
+        <th>Others</th>
+      </tr>
+    </thead>
+
+    <% datas.forEach(function(item) { %>
+    <tbody>
+      <tr>
+			<td data-column="Date"><%= moment(item.date).format("LL") %></td>
+			<td data-column="shop_expenses"><%= item.shop_expenses %></td>
+			<td data-column="good_transport"><%= item.good_transport %></td>
+			<td data-column="school_fees"><%= item.school_fees %></td>
+			<td data-column="contribution"><%= item.contribution %></td>
+			<td data-column="coperative_contribution"><%= item.coperative_contribution %></td>
+			<td data-column="household"><%= item.household %></td>
+			<td data-column="salary"><%= item.salary %></td>
+			<td data-column="others"><%= item.others %></td>
+
+      </tr>
+    </tbody>
+    <% }); %>  
+  </table>
+
+</body>
+</html>

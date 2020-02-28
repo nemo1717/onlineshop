@@ -1,0 +1,33 @@
+<link rel="stylesheet" type="text/css" href="/css/styla.css" />
+
+<% include ./navy %>
+<div class="s-layout">
+        <!-- Content -->
+        <main class="s-layout__content">
+          
+<div class="section-form">
+    <% include ./partials/messages %>
+                              
+    <% if ( success_messages !='' ) { %>
+      <div class="alert alert-success" >
+          <strong><%= success_messages %> </strong>
+      </div>
+      <% } %>
+
+        <form method="post" action="/customer">
+          <div class="intro"> 
+            <h1>Add Customer</h1>
+            
+          </div>
+          <input type="text" value="" placeholder="Customer Name " name="name" tabindex="1" required/>
+          <input type="text" value="" placeholder="Phone Number" name="pno" tabindex="2" />
+          <input type="text" value="" placeholder="Email" name="email" tabindex="3"/>
+          <input type="text" value="" placeholder="Address" name="addy" tabindex="4"/>
+          <input type="text" value="" placeholder="City" name="city" tabindex="5"/>
+          <input type="text" value="" placeholder="State" name="sate" tabindex="6"/>
+          <input type="text" value="" placeholder="Country" name="country" tabindex="7"/>
+          <button type="submit" class="btn btn-primary btn-block">Submit Customer</button>
+        </form>
+      </div>
+        </main>
+        </div>

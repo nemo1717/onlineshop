@@ -1,0 +1,48 @@
+<link rel="stylesheet" type="text/css" href="/css/styla.css" />
+
+<% include ./navy %>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+<div class="s-layout">
+
+        
+        <!-- Content -->
+        <main class="s-layout__content">
+          
+<div class="section-form">
+
+  <% include ./partials/messages %>
+                              
+    <% if ( success_messages !='' ) { %>
+      <div class="alert alert-success" >
+          <strong><%= success_messages %> </strong>
+      </div>
+      <% } %>
+   
+        <form method="post" action="/netprofit">
+          <div class="intro"> 
+            <h1>Add Net Profit</h1>
+          
+        </div>
+          <input id = "date" type="date" value="" placeholder="Date" name="date"  required/>
+          <input id="profit" type="number" placeholder="Profit" name="profit" onkeyup ="updateDue()" required/>
+          <input id="expenses" type="number"  placeholder="Expenses" name="expenses" onkeyup ="updateDue()"  required/>
+          <input id="netprofit" type="number"  placeholder="netprofit" name="netprofit" onkeyup ="updateDue()" required/>
+
+          <button type="submit" id = "register" value = "register" class="btn btn-primary btn-block">Submit</button>
+        </form>
+       
+       </div>
+        </main>
+        </div>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+<script>
+    function updateDue() {
+
+        var profit = parseInt(document.getElementById("profit").value);
+        var expenses = parseInt(document.getElementById("expenses").value);
+        result = profit - expenses;
+        document.getElementById("netprofit").value = result;
+}
+
+</script>

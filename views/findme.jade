@@ -1,0 +1,21 @@
+extends layout
+
+block content
+ h1 = content
+ table(border =1 )
+    tr 
+        td bsale_id
+        td date 
+        td batt_value
+        td batt_sales
+        td batt_cost
+        td batt_bought
+
+    each BattCalcs in BattCalc
+        tr
+            td #{BattCalcs.bsale_id}
+            td #{BattCalcs.date}
+            td #{BattCalcs.batt_value}
+            td #{BattCalcs.batt_sales}
+            td #{BattCalcs.batt_cost}
+            td #{BattCalcs.batt_bought}

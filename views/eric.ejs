@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+    <script src="https://chartjs-plugin-datalabels.netlify.com/chartjs-plugin-datalabels.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
+    <style>
+        .container-fluid {
+            margin: 20px 0px 20px;
+        }
+
+        .orangefont {
+            color: #ffc107;
+        }
+
+        .btn {
+            margin: 5px;
+        }
+
+        .card {
+            margin-bottom: 10px;
+        }
+
+        .top-row .card {
+            margin-bottom: 10px;
+            /* margin-top: 10px; */
+            height: 100%;
+        }
+
+        .top-row {
+            margin-bottom: 10px;
+            margin-top: 15px;
+        }
+
+        .orangediv1,
+        .orangediv {
+            background-color: #ffc107;
+            color: white;
+        }
+
+        .buttonasign {
+            justify-content: center;
+            display: flex;
+        }
+
+        .no-left-padding {
+            padding-left: 0px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <input type="hidden" id="x_month" value="<%= JSON.stringify(x_months) %>" />
+        <input type="hidden" id="quantity_array" value="<%= JSON.stringify(quantity_array) %>" />
+        <input type="hidden" id="price_array" value="<%= JSON.stringify(price_array) %>" />
+        <input type="hidden" id="profit_array" value="<%= JSON.stringify(profit_array) %>" />
+        <input type="hidden" id="prod_name" value="<%= JSON.stringify(prod_name) %>" />
+        <input type="hidden" id="stockquantity" value="<%= JSON.stringify(stockquantity) %>" />
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="#">Navbar</a>
+          
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+              <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                <li class="nav-item active">
+                  <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Link1</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Link2</a>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        <div class="row top-row">
+            <div class="col-sm-4">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <h3>Revenue Growth</h3>
+                        <span style="color: #3fd23f;">
+                            <i class="fas fa-arrow-alt-circle-up fa-3x"></i>
+                        </span>
+                        <h1 class="orangefont">$200K</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 no-left-padding">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <h3>Profit</h3>
+                        <span style="color: red;">
+                            <i class="fas fa-arrow-alt-circle-down fa-3x"></i>
+                        </span>
+                        <h1 class="orangefont">-$70</h1 class="orangefont">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 no-left-padding">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <h3>Total Revenue</h3>
+                        <br>
+                        <h1 class="orangefont">$500K</h1 class="orangefont">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="card bg-light">
+                    <canvas id="vertical-bar-chart1" height="320"></canvas>
+                </div>
+            </div>
+            <div class="col-sm-6 no-left-padding">
+                <div class="card bg-light">
+                    <canvas id="vertical-bar-chart2" height="320"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="card bg-light">
+                    <canvas id="bar-chart" height="320"></canvas>
+                </div>
+            </div>
+            <div class="col-sm-6 no-left-padding">
+                <div class="card bg-light">
+                    <canvas id="pie-chart" height="320"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var x_month = $('#x_month').val();
+    x_month = JSON.parse(x_month);
+
+    var quantity_array = $('#quantity_array').val();
+    quantity_array = JSON.parse(quantity_array);
+
+    var price_array = $('#price_array').val();
+    price_array = JSON.parse(price_array);
+
+    var profit_array = $('#profit_array').val();
+    profit_array = JSON.parse(profit_array);
+
+    var prod_name = $('#prod_name').val();
+    prod_name = JSON.parse(prod_name);
+
+    var stockquantity = $('#stockquantity').val();
+    stockquantity = JSON.parse(stockquantity);
+
+    //Quantity chart
+    new Chart(document.getElementById("vertical-bar-chart1"), {
+        type: 'bar',
+        data: {
+            labels: x_month,
+            datasets: [
+                {
+                    backgroundColor: ["#49d8ef", "#a27aea", "#3cba9f", "#e8c3b9", "#ef5b9f", "#ecbc2a", "#fd7e14"],
+                    data: quantity_array
+                }
+            ]
+        },
+        options: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: 'Quantity'
+            }
+        }
+    });
+
+    //Price chart
+    new Chart(document.getElementById("vertical-bar-chart2"), {
+        type: 'bar',
+        data: {
+            labels: x_month,
+            datasets: [
+                {
+                    backgroundColor: ["#49d8ef", "#a27aea", "#3cba9f", "#e8c3b9", "#ef5b9f", "#ecbc2a", "#fd7e14"],
+                    data: price_array
+                }
+            ]
+        },
+        options: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: 'Price'
+            }
+        }
+    });
+
+    //Profits chart
+    new Chart(document.getElementById("bar-chart"), {
+        type: 'horizontalBar',
+        data: {
+            labels: x_month,
+            datasets: [
+                {
+                    backgroundColor: ["#49d8ef", "#a27aea", "#3cba9f", "#e8c3b9", "#ef5b9f", "#ecbc2a", "#fd7e14"],
+                    data: profit_array
+                }
+            ]
+        },
+        options: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: 'Profits'
+            }
+        }
+    });
+
+    //Inventory chart
+    new Chart(document.getElementById("pie-chart"), {
+        type: 'pie',
+        data: {
+            labels: prod_name,
+            datasets: [{
+                backgroundColor: ["#49d8ef", "#a27aea", "#3cba9f", "#e8c3b9", "#ef5b9f", "#ecbc2a", "#fd7e14"],
+                data: stockquantity
+            }]
+        },
+        options: {
+            title: {
+                display: true,
+                text: 'Inventory'
+            }
+        }
+    });
+</script>
+
+</html>
