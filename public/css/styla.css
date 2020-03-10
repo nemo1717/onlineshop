@@ -313,7 +313,8 @@ form {
    color: #fff;
    cursor: pointer;
  }
- /* Arrow */
+
+
  .select::after {
    content: '\25BC';
    position: absolute;
@@ -327,11 +328,13 @@ form {
    -o-transition: .25s all ease;
    transition: .25s all ease;
  }
- /* Transition */
+
  .select:hover::after {
    color: #f39c12;
  }
+
  
+
   
   
   input[type=text], input[type=date], input[type=password], input[type=email], textarea {

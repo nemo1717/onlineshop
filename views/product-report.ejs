@@ -280,7 +280,8 @@ font-weight: 500;
                   <a class="dropdown-item" href="/category">Add Product Category</a>
                   <a class="dropdown-item" href="/product-report">Product Report</a>
                   <a class="dropdown-item" href="/productpurchased-report">Update Product Report</a>
-                  <a class="dropdown-item" href="category-report">Category Report</a>
+                  <a class="dropdown-item" href="/category-report">Category Report</a>
+                  <a class="dropdown-item" href="/activate-product">Activate Product</a>
                 </div>
               </li>
               <li class="nav-item dropdown">
@@ -358,21 +359,21 @@ font-weight: 500;
          </br>
          <select id="prod" class = "select" name = "prod" type = "text" >
            <optgroup>
-         <option value = "" disabled selected>filter table by product category</option>
-         <% prod_array.forEach(function(item) { %>
+         <option value = "" disabled selected>filter table by product name</option>
+         <% prods.forEach(function(item) { %>
          <option > <%= item %></option>
          <% }); %>  
          </optgroup>
        </select>
            <select id="cat" class = "select" name = "cat" type = "text" >
              <optgroup>
-           <option value = "" disabled selected>filter table by product name</option>
+           <option value = "" disabled selected>filter table by product category</option>
            <% unique_cat.forEach(function(item) { %>
            <option > <%= item %></option>
            <% }); %>  
            </optgroup>
          </select>
-           <input type="date" placeholder="filter by date" name =date onchange="this.className=(this.value!=''?'has-value':'')">
+
  
            <button type="submit" class="searchButton">
        <i class="fa fa-search"></i>
@@ -395,7 +396,7 @@ font-weight: 500;
             <% data.forEach(function(item) { %>
             
             <tr>
-              <td><a  href="delete-product/<%= item.prod_id %>" class="btn btn-primary" role="button" style="background-color: rgb(167, 49, 45);" onclick="return confirm('Are you sure want to Delete this Sale?')" >Delete</a></td>
+              <td><a  href="delete-product/<%= item.prod_id %>" class="btn btn-primary" role="button" style="background-color: rgb(167, 49, 45);" onclick="return confirm('Are you sure want to Deactivate this Product?')" >Deactivate</a></td>
               <td><%= item.prod_name %></td>
               <td><%= item.cat_name %></td>
               <td><%= item.unitprice %></td>

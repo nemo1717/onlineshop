@@ -109,7 +109,7 @@ router.post('/add_product', function (req, res, next) {
 // Inventory Update
 router.get('/inventory-update',  ensureAuthenticated, function (req, res, next) {
   
-  db.query("select * from Products where clientid = ?; select * from Supplier where clientid = ?; ", [req.user.clientid, req.user.clientid ], function (err, rs) {
+  db.query("select * from Products where clientid = ? and active_ind = 1; select * from Supplier where clientid = ?; ", [req.user.clientid, req.user.clientid ], function (err, rs) {
     if (err) {
       res.send(err);
     }
@@ -152,7 +152,7 @@ router.post('/inventory-update', function (req, res, next) {
 
 // sales
 router.get('/sales',  ensureAuthenticated, function (req, res, next) {
-  var sql = "select * from Products where clientid = ?; select * from Customer where clientid = ?;"
+  var sql = "select * from Products where clientid = ? and active_ind = 1; select * from Customer where clientid = ?;"
   db.query(sql, [req.user.clientid, req.user.clientid], function (err, rs) {
     if (err) {
       res.send(err);
@@ -812,7 +812,7 @@ router.get('/eric',  ensureAuthenticated, function (req, res, next) {
 
 // Dashboard
 router.get('/dashboard',  ensureAuthenticated, function (req, res, next) {
-  db.query("SELECT DATE_FORMAT(date,'%b/%Y') as dates, SUM(quantity) as quant, (SUM(quantity * price))  as rev, sum(price) as prices from layanenterprises.Sales where layanenterprises.Sales.clientid = ? GROUP BY YEAR(date), MONTH(date) order by date desc limit 7 ; SELECT *, ((quantity) * (price))  as tot from category join Products on category.cat_id = Products.categoryid join Sales on layanenterprises.Sales.prod_id = Products.prod_id join Customer on Sales.cust_id = Customer.cust_id where Sales.clientid = ? order by date ", [req.user.clientid, req.user.clientid], function (err, rs) {
+  db.query("SELECT DATE_FORMAT(date,'%b/%Y') as dates, SUM(quantity) as quant, (SUM(quantity * price))  as rev, sum(price) as prices from layanenterprises.Sales where layanenterprises.Sales.clientid = ? GROUP BY YEAR(date), MONTH(date) order by date desc limit 7 ; SELECT *, ((quantity) * (price))  as tot from category join Products on category.cat_id = Products.categoryid right outer join Sales on layanenterprises.Sales.prod_id = Products.prod_id left outer join Customer on Sales.cust_id = Customer.cust_id where Sales.clientid = ? order by date", [req.user.clientid, req.user.clientid], function (err, rs) {
     const x_months = [];
     const quantity_array = [];
     const price_array = [];
@@ -868,10 +868,13 @@ router.get('/dashboard',  ensureAuthenticated, function (req, res, next) {
     */
 
         // get inventory
-    db.query("select * from Products where clientid = ? ; SELECT *, year(date) as years, cat_name, DATE_FORMAT(date,'%b/%Y') as dates, sum((Sales.price * Sales.quantity) - (Sales.quantity * Products.unitprice)) as profit FROM Sales join Products on Sales.prod_id = Products.prod_id  join category on Products.categoryid = category.cat_id where Sales.clientid = ? group by  month(date), year(date) order by date desc limit 7;", [req.user.clientid, req.user.clientid], function (err, re) {
+    db.query("SELECT prod_name, sum(stockquantity) as quant FROM layanenterprises.Products where clientid = ? and active_ind = 1 group by prod_name order by stockquantity desc limit 7 ; SELECT *, year(date) as years, cat_name, DATE_FORMAT(date,'%b/%Y') as dates, sum((Sales.price * Sales.quantity) - (Sales.quantity * Products.unitprice)) as profit FROM Sales join Products on Sales.prod_id = Products.prod_id  join category on Products.categoryid = category.cat_id where Sales.clientid = ? group by  month(date), year(date) order by date desc limit 7;", [req.user.clientid, req.user.clientid], function (err, re) {
+
+      var profmaxyrsum = 0;
+
       re[0].map(data => {
         prod_name.push(data.prod_name);
-        stockquantity.push(data.stockquantity);
+        stockquantity.push(data.quant);
       });
 
       re[1].map(data => {
@@ -890,18 +893,17 @@ router.get('/dashboard',  ensureAuthenticated, function (req, res, next) {
 
     
         re[1].map(data => {
-          if(data.date.getFullYear() == maxyear)
+          if(data.date.getFullYear() == profmaxyear)
           {
             profmaxyrsum += data.profit;
           }
-          if(data.date.getFullYear() == prevyear)
+          if(data.date.getFullYear() == profmaxyear)
           {
             profprevyrsum += data.profit;
           }
+    
         });
   
-
-
       res.render('dashboard', {datas:rs[1], x_months, profmaxyrsum, x_monthss, prod_name, stockquantity, profit_array, quantity_array, price_array, prevyrsum, maxyrsum, rev, moment : moment});
 
     });
@@ -921,7 +923,7 @@ router.get('/dashboard',  ensureAuthenticated, function (req, res, next) {
 
 
 router.get('/sales-reports',  ensureAuthenticated, function (req, res, next) {
-  db.query("SELECT  DATE_FORMAT(date,'%b/%Y') as dates, SUM(quantity) as quant, (SUM(quantity * price))  as rev, sum(price) as prices from layanenterprises.Sales where layanenterprises.Sales.clientid = ? GROUP BY YEAR(date), MONTH(date) order by date desc limit 7; SELECT *, ((quantity) * (price))  as tot from category join Products on category.cat_id = Products.categoryid join Sales on layanenterprises.Sales.prod_id = Products.prod_id join Customer on Sales.cust_id = Customer.cust_id where Sales.clientid = ? order by date ", [req.user.clientid, req.user.clientid], function (err, rs) {
+  db.query("SELECT  DATE_FORMAT(date,'%b/%Y') as dates, SUM(quantity) as quant, (SUM(quantity * price))  as rev, sum(price) as prices from layanenterprises.Sales where layanenterprises.Sales.clientid = ? GROUP BY YEAR(date), MONTH(date) order by date desc limit 7; SELECT *, ((quantity) * (price))  as tot from category join Products on category.cat_id = Products.categoryid right outer join Sales on layanenterprises.Sales.prod_id = Products.prod_id left outer join Customer on Sales.cust_id = Customer.cust_id where Sales.clientid = ? order by date ", [req.user.clientid, req.user.clientid], function (err, rs) {
 
     const x_months = [];
     const quantity_array = [];
@@ -1011,7 +1013,7 @@ router.get('/delete/:ids',  ensureAuthenticated, function (req, res, next) {
 
 //search sales report
 router.get('/searchme',  ensureAuthenticated, function (req, res, next) {
-  db.query("SELECT *, DATE_FORMAT(date,'%b/%Y') as dates, SUM(quantity) as quant, (SUM(quantity * price))  as rev, sum(price) as prices from layanenterprises.Sales where layanenterprises.Sales.clientid = ? GROUP BY YEAR(date), MONTH(date) order by date desc limit 7; SELECT *, ((quantity) * (price))  as tot from category join Products on category.cat_id = Products.categoryid join Sales on layanenterprises.Sales.prod_id = Products.prod_id join Customer on Sales.cust_id = Customer.cust_id where Sales.clientid = ? and (Sales.date = ? or cat_name = ? or prod_name = ? ); select * from category join Products on category.cat_id = Products.categoryid where category.clientid = ?", [req.user.clientid, req.user.clientid, req.query.date, req.query.cat, req.query.prod, req.user.clientid], function (err, rs) {
+  db.query("SELECT *, DATE_FORMAT(date,'%b/%Y') as dates, SUM(quantity) as quant, (SUM(quantity * price))  as rev, sum(price) as prices from layanenterprises.Sales where layanenterprises.Sales.clientid = ? GROUP BY YEAR(date), MONTH(date) order by date desc limit 7; SELECT *, ((quantity) * (price))  as tot from category join Products on category.cat_id = Products.categoryid right outer join Sales on layanenterprises.Sales.prod_id = Products.prod_id left outer join Customer on Sales.cust_id = Customer.cust_id where Sales.clientid = ? and (Sales.date = ? or cat_name = ? or prod_name = ? ); select * from category join Products on category.cat_id = Products.categoryid where category.clientid = ?", [req.user.clientid, req.user.clientid, req.query.date, req.query.cat, req.query.prod, req.user.clientid], function (err, rs) {
 
     const x_months = [];
     const quantity_array = [];
@@ -1087,7 +1089,7 @@ router.get('/searchme',  ensureAuthenticated, function (req, res, next) {
 
 // Category Report
 router.get('/category-report',  ensureAuthenticated, function (req, res, next) {
-  db.query("SELECT *, sum(quantity) as quant from category join Products on category.cat_id = Products.categoryid join Sales on Sales.prod_id = Products.prod_id join Customer on Sales.cust_id = Customer.cust_id where Sales.clientid = ? and (cat_name is not NULL or cat_name <> ' ') group by category.cat_name;", [req.user.clientid], function (err, rs) {
+  db.query("SELECT *, sum(quantity) as quant from category join Products on category.cat_id = Products.categoryid right outer join Sales on Sales.prod_id = Products.prod_id left outer join Customer on Sales.cust_id = Customer.cust_id where Sales.clientid = ? and (cat_name is not NULL or cat_name <> ' ') group by category.cat_name;", [req.user.clientid], function (err, rs) {
     console.log(rs);
     const cat_name = [];
     const quantity_sold = [];
@@ -1098,9 +1100,6 @@ router.get('/category-report',  ensureAuthenticated, function (req, res, next) {
       quantity_sold.push(data.quant);
       
     });
-
-
-
 
     res.render('category-report', {data:rs, cat_name,  quantity_sold});
   });
@@ -1160,7 +1159,7 @@ router.get('/customer-search',  ensureAuthenticated, function (req, res, next) {
 
 
 router.get('/productpurchased-report',  ensureAuthenticated, function (req, res, next) {
-  db.query("SELECT  *, productPurchases.add_by as adds FROM productPurchases join Products on productPurchases.prod_id = Products.prod_id join Supplier on productPurchases.sup_id = Supplier.sup_id join category on category.cat_id = Products.categoryid where productPurchases.clientid = ? order by date;", [req.user.clientid], function (err, rs) {
+  db.query("SELECT  *, productPurchases.add_by as adds FROM productPurchases left outer join Products on productPurchases.prod_id = Products.prod_id left outer join Supplier on productPurchases.sup_id = Supplier.sup_id left outer join category on category.cat_id = Products.categoryid where productPurchases.clientid = ? order by date; ", [req.user.clientid], function (err, rs) {
     const cat_array = [];
     const prod_array = [];
 
@@ -1188,7 +1187,7 @@ router.get('/productpurchased-report',  ensureAuthenticated, function (req, res,
 });
 
 router.get('/productpurchased-search',  ensureAuthenticated, function (req, res, next) {
-  db.query("SELECT  *, productPurchases.add_by as adds FROM productPurchases join Products on productPurchases.prod_id = Products.prod_id join Supplier on productPurchases.sup_id = Supplier.sup_id join category on category.cat_id = Products.categoryid where productPurchases.clientid = ? ; SELECT  *, productPurchases.add_by as adds FROM productPurchases join Products on productPurchases.prod_id = Products.prod_id join Supplier on productPurchases.sup_id = Supplier.sup_id join category on category.cat_id = Products.categoryid where productPurchases.clientid = ? and (cat_name = ? or productPurchases.date = ? or prod_name = ? ) order by date ;", [req.user.clientid,req.user.clientid, req.query.cat, req.query.date, req.query.prod], function (err, rs) {
+  db.query("SELECT  *, productPurchases.add_by as adds FROM productPurchases left outer join Products on productPurchases.prod_id = Products.prod_id left outer join Supplier on productPurchases.sup_id = Supplier.sup_id left outer join category on category.cat_id = Products.categoryid where productPurchases.clientid = ? ; SELECT  *, productPurchases.add_by as adds FROM productPurchases left outer join Products on productPurchases.prod_id = Products.prod_id left outer join Supplier on productPurchases.sup_id = Supplier.sup_id left outer join category on category.cat_id = Products.categoryid where productPurchases.clientid = ? and (cat_name = ? or productPurchases.date = ? or prod_name = ? ) order by date ;", [req.user.clientid,req.user.clientid, req.query.cat, req.query.date, req.query.prod], function (err, rs) {
     const cat_array = [];
     const prod_array = [];
 
@@ -1230,15 +1229,22 @@ router.get('/delete-purchases/:ids',  ensureAuthenticated, function (req, res, n
 
 
 router.get('/product-report',  ensureAuthenticated, function (req, res, next) {
-  db.query("SELECT *, sum(stockquantity) as quant FROM Products join category on Products.categoryid = category.cat_id where Products.clientid = ?  group by prod_name; SELECT * FROM  category join Products on Products.categoryid = category.cat_id  where Products.clientid = ? ;", [req.user.clientid,req.user.clientid], function (err, rs) {
+  db.query("SELECT *, sum(stockquantity) as quant FROM Products join category on Products.categoryid = category.cat_id where Products.clientid = ? and active_ind = 1  group by prod_name ; SELECT * FROM  category join Products on Products.categoryid = category.cat_id  where Products.clientid = ? and active_ind = 1 ; SELECT prod_name, sum(stockquantity) as quant FROM layanenterprises.Products where clientid = ? and active_ind = 1 group by prod_name order by stockquantity desc limit 7 ; ", [req.user.clientid,req.user.clientid, req.user.clientid], function (err, rs) {
     const quantity_array = [];
     const prod_array = [];
     const cat_array = [];
+    const prods = [];
 
     rs[0].map(data => {
+
+      cat_array.push(data.cat_name);
+      prods.push(data.prod_name);
+    });
+
+    rs[2].map(data => {
       quantity_array.push(data.quant);
       prod_array.push(data.prod_name);
-      cat_array.push(data.cat_name);
+
     });
 
     function onlyUnique(value, index, self) { 
@@ -1248,39 +1254,44 @@ router.get('/product-report',  ensureAuthenticated, function (req, res, next) {
   // usage example:
   var unique_cat = cat_array.filter( onlyUnique ); 
   //var unique_prod = prod_array.filter( onlyUnique ); 
-    res.render('product-report', {data:rs[1], unique_cat,prod_array,quantity_array,  moment:moment});
+    res.render('product-report', {data:rs[1], unique_cat,prod_array, prods, quantity_array,  moment:moment});
   });
 
 });
 
 
 router.get('/product-search',  ensureAuthenticated, function (req, res, next) {
-  db.query("SELECT *, sum(stockquantity) as quant FROM Products join category on Products.categoryid = category.cat_id where Products.clientid = ?  group by prod_name; SELECT * FROM  category left outer join Products on Products.categoryid = category.cat_id left outer join Supplier on Supplier.sup_id = Products.sup_id where Products.clientid = ? and (cat_name = ? or prod_name = ?) ;", [req.user.clientid,req.user.clientid, req.query.cat, req.query.prod], function (err, rs) {
+  db.query("SELECT *, sum(stockquantity) as quant FROM Products join category on Products.categoryid = category.cat_id where Products.clientid = ? and active_ind = 1  group by prod_name; SELECT * FROM  category left outer join Products on Products.categoryid = category.cat_id left outer join Supplier on Supplier.sup_id = Products.sup_id where Products.clientid = ? and active_ind = 1 and  (cat_name = ? or prod_name = ?) ; SELECT prod_name, sum(stockquantity) as quant FROM layanenterprises.Products where clientid = ? and active_ind = 1 group by prod_name order by stockquantity desc limit 7 ; ", [req.user.clientid,req.user.clientid, req.query.cat, req.query.prod, req.user.clientid], function (err, rs) {
     const quantity_array = [];
     const prod_array = [];
     const cat_array = [];
+    const prods = [];
 
     rs[0].map(data => {
+
+      cat_array.push(data.cat_name);
+      prods.push(data.prod_name);
+    });
+
+    rs[2].map(data => {
       quantity_array.push(data.quant);
       prod_array.push(data.prod_name);
-      cat_array.push(data.cat_name);
     });
+
 
     function onlyUnique(value, index, self) { 
       return self.indexOf(value) === index;
   }
-  
   // usage example:
   var unique_cat = cat_array.filter( onlyUnique ); 
   //var unique_prod = prod_array.filter( onlyUnique ); 
-    res.render('product-report', {data:rs[1], unique_cat,prod_array,quantity_array,  moment:moment});
+    res.render('product-report', {data:rs[1], unique_cat, prods, prod_array,quantity_array,  moment:moment});
   });
-
 });
 
 router.get('/delete-product/:ids',  ensureAuthenticated, function (req, res, next) {
   var num = req.params.ids
-  db.query('DELETE FROM Products WHERE prod_id = ? ;', num , function (err, rs) {
+  db.query('update Products set active_ind = 0 WHERE prod_id = ? ;', num , function (err, rs) {
     if (err) {
       res.send('err');
     }
@@ -1514,7 +1525,7 @@ router.get('/expenses',  ensureAuthenticated, function (req, res, next) {
 router.post('/expenses', function (req, res, next) {
   const{date, shop_exp, prod_transp, sch_fee, contri, cop, hhold, sal, others} = req.body;
   var total_exp = parseFloat(shop_exp) + parseFloat(prod_transp) + parseFloat(sch_fee) + parseFloat(contri) + parseFloat(cop) + parseFloat(hhold) + parseFloat(sal) + parseFloat(others);
-  const full_name = req.user.first_name + ' ' + req.user.last_name
+  const full_name = req.user.first_name + ' ' + req.user.last_name;
   db.query("Insert into Expenses (date, shop_expenses, good_transport, school_fees, contribution, coperative, household, salary, others, clientid, add_by, total_expenses) values ('" + date + "','" + shop_exp + "','" + prod_transp + "', '" + sch_fee + "','" + contri + "','" + cop + "', '" + hhold + "','" + sal + "','" + others + "','" + req.user.clientid + "','" + full_name + "', '" + total_exp + "')", function (err, rs) {
     if (err) {
       console.log(err);
@@ -1525,9 +1536,7 @@ router.post('/expenses', function (req, res, next) {
       req.flash('success_msg', 'Expenses Successfully Added')
       res.redirect('/expenses');
     }
-
   });
-
 });
 
 
@@ -1744,6 +1753,83 @@ router.get('/netprofit',  ensureAuthenticated, function (req, res, next) {
       }
     });
   });
+
+
+  // Activate Product
+
+  router.get('/activate-product',  ensureAuthenticated, function (req, res, next) {
+    db.query("SELECT *, sum(stockquantity) as quant FROM Products join category on Products.categoryid = category.cat_id where Products.clientid = ? and active_ind = 0  group by prod_name ; SELECT * FROM  category join Products on Products.categoryid = category.cat_id  where Products.clientid = ? and active_ind = 0 ; SELECT prod_name, sum(stockquantity) as quant FROM layanenterprises.Products where clientid = ? and active_ind = 0 group by prod_name order by stockquantity desc limit 7 ; ", [req.user.clientid,req.user.clientid, req.user.clientid], function (err, rs) {
+      const quantity_array = [];
+      const prod_array = [];
+      const cat_array = [];
+      const prods = [];
+  
+      rs[0].map(data => {
+  
+        cat_array.push(data.cat_name);
+        prods.push(data.prod_name);
+      });
+  
+      rs[2].map(data => {
+        quantity_array.push(data.quant);
+        prod_array.push(data.prod_name);
+  
+      });
+  
+      function onlyUnique(value, index, self) { 
+        return self.indexOf(value) === index;
+    }
+    
+    // usage example:
+    var unique_cat = cat_array.filter( onlyUnique ); 
+    //var unique_prod = prod_array.filter( onlyUnique ); 
+      res.render('activate-product', {data:rs[1], unique_cat,prod_array, prods, quantity_array,  moment:moment});
+    });
+  
+  });
+  
+  
+  router.get('/product-activate-search',  ensureAuthenticated, function (req, res, next) {
+    db.query("SELECT *, sum(stockquantity) as quant FROM Products join category on Products.categoryid = category.cat_id where Products.clientid = ? and active_ind = 0  group by prod_name; SELECT * FROM  category left outer join Products on Products.categoryid = category.cat_id left outer join Supplier on Supplier.sup_id = Products.sup_id where Products.clientid = ? and active_ind = 0 and  (cat_name = ? or prod_name = ?) ; SELECT prod_name, sum(stockquantity) as quant FROM layanenterprises.Products where clientid = ? and active_ind = 0 group by prod_name order by stockquantity desc limit 7 ; ", [req.user.clientid,req.user.clientid, req.query.cat, req.query.prod, req.user.clientid], function (err, rs) {
+      const quantity_array = [];
+      const prod_array = [];
+      const cat_array = [];
+      const prods = [];
+  
+      rs[0].map(data => {
+  
+        cat_array.push(data.cat_name);
+        prods.push(data.prod_name);
+      });
+  
+      rs[2].map(data => {
+        quantity_array.push(data.quant);
+        prod_array.push(data.prod_name);
+      });
+  
+  
+      function onlyUnique(value, index, self) { 
+        return self.indexOf(value) === index;
+    }
+    // usage example:
+    var unique_cat = cat_array.filter( onlyUnique ); 
+    //var unique_prod = prod_array.filter( onlyUnique ); 
+      res.render('activate-product', {data:rs[1], prods, unique_cat,prod_array,quantity_array,  moment:moment});
+    });
+  });
+  
+  router.get('/activate-product/:ids',  ensureAuthenticated, function (req, res, next) {
+    var num = req.params.ids
+    db.query('update Products set active_ind = 1 WHERE prod_id = ? ;', num , function (err, rs) {
+      if (err) {
+        res.send('err');
+      }
+      else {
+        res.redirect('/activate-product');
+      }
+    });
+  });
+  
   
 
 
