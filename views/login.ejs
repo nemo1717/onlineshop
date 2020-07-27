@@ -11,6 +11,20 @@
 
 <header>
   <style>
+    #bodys {
+      font-family: 'Open Sans', sans-serif;
+      
+    background-image:url('../uploads/bimagesss.jpg');
+    background-attachment:fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+    }
+
+ 
+
+
+
+
     .container-fluid {
         margin: 20px 0px 20px;
     }
@@ -52,16 +66,19 @@
     .no-left-padding {
         padding-left: 0px !important;
     }
+
+
+
 </style>
 
 </header>
 
 
-  <body>
+  <body id="bodys">
 
-  
 
-    <div class="section-form">
+
+    <div style="text-align: center;" class="section-form">
       <% include ./partials/messages %>
                                   
       <% if ( success_messages !='' ) { %>
@@ -72,19 +89,16 @@
     
             <form  action="/login" method="post">
               <div class="intro"> 
-                <h1>Login</h1>
+                <h1 style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; font-size: 18px;">Login</h1>
 
-              <input type="text" value="" placeholder="Unique Name" name="uname" tabindex="4" required/>
               <input type="email" value="" placeholder="Email" name="email" tabindex="2" required/>
               <input type="password" value="" placeholder="Password  " name="password" tabindex="3" required/>
-             
-             
-   
+              
               </div >
 
-              <p class="lead mt-4"><h5>Dont have an account? <a href="/login">Register</a></h5></p>
+              <p class="lead mt-4"><h5>Dont have an account? <a href="/register">Register</a></h5></p>
 
-              <button type="submit" class="btn btn-primary btn-block">Submit</button>
+              <button style="background-color: green;"  class="btn btn-primary btn-block"  type="submit">Submit</button>
             </form>
           </div>
             </main>

@@ -655,6 +655,12 @@ fieldset {
 }
 
 
+.div-added {
+  padding: 10px;
+  border: 2px solid #333;
+}
+
+
 /* advert *
 
 .rw-words-1 span{

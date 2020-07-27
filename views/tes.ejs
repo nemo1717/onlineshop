@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<div id="container"></div>
+  
+</body>
+<script>
+  // var desc = $('#desc').val();
+var data=[{image:"https://bestjquery.com/tutorial/product-grid/demo9/images/img-2.jpg"},
+{image:"MyImage-1591507932201.jpg"},
+{image:"photos-1591548210637.jpg,photos-1591548210640.png"},
+{image:"MyImage-1591494888039.png"},
+{image:"MyImage-1591505437596.jpg"},
+{image:"MyImage-1591084895899.jpg"},
+{image:"MyImage-1591085173153.jpg"},
+{image:"MyImage-1590905192772.JPG"}];
+
+$("#container").html(data.map(item=>
+    `<input type="text" class="desc" value="${item.image}" /><br>`
+    + item.image.split(',').map(pth=>`<img class="pic1" src ="${pth}" alt="${pth}"><br>`)).join(''));
+</script>
+</html>

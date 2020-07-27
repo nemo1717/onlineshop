@@ -3,11 +3,12 @@ var mysql = require('mysql');
 var bcrypt = require('bcryptjs');
 var nodemailer = require('nodemailer');
 
+var mysql = require('mysql');
 var db = mysql.createPool({
-  host: 'layanenterprises.cjajxkvdxg0f.us-east-2.rds.amazonaws.com',
-  user: 'layanent',
-  password: 'Layangrade17',
-  database: 'layanenterprises',
+  host: 'sodiq-enterprises.c56ky9ttj1zp.us-east-2.rds.amazonaws.com',
+  user: 'root',
+  password: 'Bestlayan17',
+  database: 'sodiq_business',
   multipleStatements: true
 
 });
@@ -15,25 +16,20 @@ var db = mysql.createPool({
 module.exports = function(passport) {
   passport.use(
       
-      new LocalStrategy({ usernameField: 'email', passReqToCallback: true }, (req, email, password, done) => {
-
-        const clientids = req.body.uname;
-
-        // Match Unique Name
-        db.query(" select * from Users where clientid = ? ; ", clientids, function(err, data){
-           if(!data.length){
-             return done(null, false, { message: 'The Unique Name is not Registered' });
-           }
-
-           else {
-                    // Match email
-        db.query(" select * from Users where email = ?  ; ",
+      new LocalStrategy({ usernameField: 'email', passwordField: 'password' }, ( email, password, done) => {
+        
+        // Match email
+        db.query("select * from customer where email = ? ",
         email, function(err, data){
+
+          console.log(email);
+          
+
           if(!data.length){
-            return done(null, false, { message: 'The Email is not Registered' });
+            return done(null, false, { message: 'That email is not registered' });
           }
 
-          /*
+/*
             
           else{
 
@@ -89,30 +85,24 @@ module.exports = function(passport) {
           
             }
             */
-
-        else {
-          // decrypy password
+            else {
           bcrypt.compare(password, data[0].password, (err, isMatch)=>{
             console.log(data[0].password);
 
-            //if(err) throw err;
+            if(err) throw err;
 
          
             if(isMatch){
               return done(null, data[0]);
             }
             else{
-              return done(null, false, {message: 'Password is not correct. Try Again'});
+              return done(null, false, {message: 'Password is not correct'});
             }
           });
-        }  
-            
-      });
-
-    }
-  });
-  })
-);
+        }
+        });
+      })
+    );
       
 
     
@@ -122,7 +112,7 @@ module.exports = function(passport) {
   
       // used to deserialize the user
     passport.deserializeUser(function(id, done) {
-      db.query("select * from Users where id = ?",[id],function(err,rows){
+      db.query("select * from customer where id = ?",[id],function(err,rows){
         done(err, rows[0]);
       });
     });

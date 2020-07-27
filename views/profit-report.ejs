@@ -137,7 +137,8 @@ body {
   padding: 0 2em;
   font-family: Arial, sans-serif;
   color: #024457;
-  background: #f2f2f2;
+  background: #f2f4fa;
+  font-size: calc(0.75em + 1vmin);
 }
 
 h1 {
@@ -251,6 +252,20 @@ select option {
   font-weight: 500;
 
 }
+
+@media only screen and (max-width: 768px) {
+        .container  {
+        position: absolute;
+        width: 100%;
+        left: 0;
+        }
+        
+        canvas {
+            height: 320;
+            width: 100%;
+        }
+
+    }
 
 
 
@@ -368,7 +383,7 @@ select option {
 
               -->
 
-              <div class="col-sm-4 no-left-padding">
+              <div class="col-sm-4 ">
                 <div class="card bg-light">
                     <div class="card-body text-center">
                         <h4>Previous Year Profit</h4>
@@ -378,7 +393,7 @@ select option {
                 </div>
             </div>
 
-              <div class="col-sm-4 no-left-padding">
+              <div class="col-sm-4 ">
                 <div class="card bg-light">
                     <div class="card-body text-center">
                         <h4>Previous Year Profit</h4>
@@ -388,7 +403,7 @@ select option {
                 </div>
             </div>
 
-              <div class="col-sm-4 no-left-padding">
+              <div class="col-sm-4 ">
                   <div class="card bg-light">
                       <div class="card-body text-center">
                           <h5>Current Year Profit</h5>
@@ -414,12 +429,12 @@ select option {
           </br>
               <div   class="col-sm-6">
                   <div class="card bg-light">
-                      <canvas id="vertical-bar-chart1" height="2000" width="4000"></canvas>
+                      <canvas id="vertical-bar-chart1" height="250" ></canvas>
                   </div>
               </div>
               <div class="col-sm-6 ">
                 <div class="card bg-light">
-                    <canvas id="vertical-bar-chart2" height="2000" width="4000" ></canvas>
+                    <canvas id="vertical-bar-chart2" height="250"  ></canvas>
                 </div>
             </div>
           </div>

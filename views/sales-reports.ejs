@@ -137,7 +137,8 @@ body {
   padding: 0 2em;
   font-family: Arial, sans-serif;
   color: #024457;
-  background: #f2f2f2;
+  background: #f2f4fa;
+  font-size: calc(0.75em + 1vmin);
 }
 
 h1 {
@@ -250,6 +251,35 @@ font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 font-weight: 500;
 
 }
+
+@media only screen and (max-width: 768px) {
+        .container  {
+        position: absolute;
+        width: 100%;
+        left: 0;
+     
+        }
+        
+        canvas {
+            height: 320;
+            width: 100%;
+        }
+
+        .responstable th, .responstable td {
+    display: table-cell;
+    padding: 1em;
+   
+
+
+  }
+
+  .responstable td {
+    border: 1px solid #D9E4E6;
+  }
+
+
+    }
+
     </style>
 </head>
 
@@ -364,32 +394,32 @@ font-weight: 500;
 
               -->
 
-              <div class="col-sm-4 no-left-padding">
+              <div class="col-sm-4 ">
                 <div class="card bg-light">
                     <div class="card-body text-center">
                         <h5>Current Year Quantity Sold</h5>
                         <br>
-                        <h3 id="valuess"  class="orangefont"><%= quantmaxyr %></h3 class="orangefont">
+                        <h4  id="valuess"  class="orangefont"><%= quantmaxyr %></h4 class="orangefont">
                     </div>
                 </div>
             </div>
 
-              <div class="col-sm-4 no-left-padding">
+              <div class="col-sm-4 g">
                 <div class="card bg-light">
                     <div class="card-body text-center">
                         <h5>Previous Year Revenue</h5>
                         <br>
-                        <h3 id="value" class="orangefont"><span style="color: #ffc107;">&#8358; </span><%= prevyrsum %></h3 class="orangefont">
+                        <h4  id="value" class="orangefont"><span style="color: #ffc107;">&#8358; </span><%= prevyrsum %></h4 class="orangefont">
                     </div>
                 </div>
             </div>
 
-              <div class="col-sm-4 no-left-padding">
+              <div class="col-sm-4 ">
                   <div class="card bg-light">
                       <div class="card-body text-center">
                           <h5>Current Year Revenue</h5>
                           <br>
-                          <h3 id="values"  class="orangefont"><span style="color: #ffc107;">&#8358; </span><%= maxyrsum %></h3 class="orangefont">
+                          <h4  id="values"  class="orangefont"><span style="color: #ffc107;">&#8358; </span><%= maxyrsum %></h4 class="orangefont">
                       </div>
                   </div>
               </div>
@@ -410,12 +440,12 @@ font-weight: 500;
           </br>
               <div   class="col-sm-6">
                   <div class="card bg-light">
-                      <canvas id="vertical-bar-chart1" height="2000" width="4000"></canvas>
+                      <canvas id="vertical-bar-chart1" height="250" ></canvas>
                   </div>
               </div>
               <div class="col-sm-6 ">
                 <div class="card bg-light">
-                    <canvas id="vertical-bar-chart2" height="2000" width="4000" ></canvas>
+                    <canvas id="vertical-bar-chart2" height="250"  ></canvas>
                 </div>
             </div>
           </div>
@@ -445,6 +475,8 @@ font-weight: 500;
      </button>
       </form>
 
+      <div style="overflow-y:auto" >
+
           <table class="responstable"> 
             <tr>
               <th>Main driver</th>
@@ -461,7 +493,7 @@ font-weight: 500;
             <% datas.forEach(function(item) { %>
             
             <tr>
-              <td><a  href="delete/<%= item.sales_id %>" class="btn btn-primary" role="button" style="background-color: rgb(167, 49, 45);" onclick="return confirm('Are you sure want to Delete this Sale?')" >Delete Sales</a></td>
+              <td><a  href="delete/<%= item.sales_id %>" class="btn btn-primary" role="button" style="background-color: rgb(167, 49, 45);" onclick="return confirm('Are you sure want to Delete this Sale?')" >Delete</a></td>
               <td><%= moment(item.date).format("LL") %></td>
               <td><%= item.prod_name %></td>
               <td><%= item.cat_name%></td>
@@ -473,6 +505,7 @@ font-weight: 500;
           
             <% }); %>
           </table>
+        </div>
 
     </div>
 </body>

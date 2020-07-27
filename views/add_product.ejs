@@ -1,6 +1,8 @@
 <link rel="stylesheet" type="text/css" href="/css/styla.css" />
 
-<% include ./navy %>
+<link href="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.min.css" rel="stylesheet"/>
+
+
 <div class="s-layout">
 
         
@@ -16,22 +18,94 @@
     </div>
     <% } %>
 
-        <form  action="/add_product" method="post">
+    <h4 style="text-align: center; color: red; font-size: 15px"><%= typeof msg != 'undefined' ? msg : '' %></h4>
+
+        <form  action="/add_product" method="post" autocomplete="off"  enctype="multipart/form-data">
           <div class="intro"> 
-            <h1>Add Your Products</h1>
+            <h1 style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; font-size: 18px;">Add Your Products</h1>
           </div>
-          <input type="text" value="" placeholder="Product Name " name="pname"  required/>
+          <select id= "prod" class = "select" name = "prod" type = "text"  required = "required">
+            <option value = "" disabled selected>Select Product</option>
+            <% product.forEach(function(item) { %>
+            <option > <%= item.prod_name %></option>
+            <% }); %>  
+          </select>
+
+          <select id="size" class = "select" name = "size" type = "text"  required = "required">
+            <option value = "" disabled selected>Select Size</option>
+            <% size.forEach(function(item) { %>
+            <option > <%= item.size %></option>
+            <% }); %>  
+          </select>
+
+          <select id="gender" class = "select" name = "gender" type = "text"  required = "required">
+            <option value = "" disabled selected>Select Gender</option>
+            <% gender.forEach(function(item) { %>
+            <option > <%= item.gender %></option>
+            <% }); %>  
+          </select>
+
+          <select id="ptype" class = "select" name = "ptype" type = "text"  required = "required">
+            <option value = "" disabled selected>Select Product Type</option>
+            <% product_type.forEach(function(item) { %>
+            <option > <%= item.product_type %></option>
+            <% }); %>  
+          </select>
+
+          <select id="color" class = "select" name = "color" type = "text"  required = "required">
+            <option value = "" disabled selected>Select Color</option>
+            <% color.forEach(function(item) { %>
+            <option > <%= item.color_name %></option>
+            <% }); %>  
+          </select>
+
           <select id="cat" class = "select" name = "cat" type = "text"  required = "required">
             <option value = "" disabled selected>Select Category</option>
             <% categ.forEach(function(item) { %>
             <option > <%= item.cat_name %></option>
             <% }); %>  
           </select>
+          
+          <select id="sup" class = "select" name = "sup" type = "text"  required = "required">
+            <option value = "" disabled selected>Select Supplier</option>
+            <% supp.forEach(function(item) { %>
+            <option > <%= item.sup_name %></option>
+            <% }); %>  
+          </select>
+
           <input type="text" value="" placeholder="Unit Price " name="price" required/>
           <input type="number" value="" placeholder="Stock Quanity" name="quant"  required/>
-          <textarea placeholder="Product Description" name="description"  rows="10"></textarea>
-          <button type="submit" class="btn btn-primary btn-block">Submit</button>
+
+          <select  data-placeholder="Choose Descriptions" multiple class="chosen-select" name="description" style=" width: 97%" required = "required" >
+            <option value=""></option>
+            <% description.forEach(function(item) { %>
+              <option > <%= item.description %></option>
+              <% }); %>  
+          </select>
+      
+        <input type="file"  name = "photos"  multiple/>
+
+        <input type="file"  name = "photos"  multiple/>
+
+        <input type="file"  name = "photos"  multiple/>
+
+        <input type="file"  name = "photos"  multiple/>
+        
+
+
+          <button type="submit" style="background-color: green;"  class="btn btn-primary btn-block" >Submit</button>
         </form>
       </div>
         </main>
+
         </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.jquery.min.js"></script>
+
+        <script>
+          $(".chosen-select").chosen({
+  no_results_text: "Oops, nothing found!"
+})
+        </script>
+
+

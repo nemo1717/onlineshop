@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<!-- Bootstrap CSS -->
+
+<link rel="stylesheet" href="style.css">
+<title>Hello, world!</title>
+</head>
+
+<style>
+    /* CSS Document */
+
+
+.card{text-align: center; border: none; border-radius: 5px;-webkit-box-shadow: 12px 14px 22px 2px rgba(0,0,0,0.75);
+-moz-box-shadow: 12px 14px 22px 2px rgba(0,0,0,0.75);
+box-shadow: 12px 14px 22px 2px rgba(0,0,0,0.75);
+margin-bottom: 70px;
+font-family: Raleway,sans-serif;
+ 
+  padding: 0 0 72px;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 40px;
+  height: 400px;
+
+
+}
+
+.li-added {
+  list-style: square url("38specialPlusP.gif");
+  font-weight: bold;
+  color: green;
+  font-size: large;
+}
+
+#active, #notactive {
+  position: relative;
+  -webkit-transition: all .3s ease 0s;
+  transition: all .3s ease 0s;
+  overflow: hidden;
+  height: 600px;
+  object-fit: cover;
+
+}
+
+ img {
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1;
+  object-fit: cover;
+ }
+
+.card img {
+  
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  object-fit: cover;
+}
+
+
+#size h5 {display: inline-block;}
+
+.itemcontainer {
+  
+  padding: 30px; 
+  float: left;
+  overflow:auto;
+  width: 50%;
+  background:rgb(245, 247, 245);
+
+
+
+}
+
+@media only screen and (max-width: 768px) {
+  .itemcontainer {
+
+  width: auto;
+  background: none;
+
+
+}
+}
+
+</style>
+<body>
+
+ 
+  <%if (lname) { %>
+    <% include ./navis %>
+  <% } %>
+
+ <%if (!lname) { %>
+  <% include ./navi %>
+ <% } %>
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-12">  </div>
+  </div>
+</div>
+<div class="container">
+<% data.forEach(function(item) { %>
+  <input type="hidden" id="desc" value="<%= item.descr %>" />
+  <div class="row">
+    <div class="col-md-6">
+      <div  id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+          <div id="active" class="carousel-item active"> <img class="d-block w-100" src="/<%= item.image1 %>" alt="First slide" style="object-fit: cover;"> </div>
+         <div id="notactive" class="carousel-item"> <img class="d-block w-100" src="/<%= item.image2 %>"  alt="Second slide" style="object-fit: cover; "> </div> 
+        </div>
+        <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev"> <span class="carousel-control-prev-icon" aria-hidden="true"></span> <span class="sr-only">Previous</span> </a> <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next"> <span class="carousel-control-next-icon" aria-hidden="true"></span> <span class="sr-only">Next</span> </a> 
+      </div>
+    </div>
+  <div  class="itemcontainer">
+    <div class="col-md-6">
+      <div class="row">
+        <h3><%= item.prod_name%></3>
+      </div>
+      <div class="row">
+        <h5 style="font-weight: 500; margin-top: 8px;"><span  style="color: #1d1c1b;">&#8358;</span><%= item.price %></h5>
+        <!--
+        &nbsp; &nbsp;
+        <h5><del>799</del></h5>
+        &nbsp; &nbsp;
+        <h5 class="text-success">30% off</h5>
+        -->
+      </div>
+
+      <!-- REVIEW WHEN NEEDED
+      <div class="row">
+        <h3 class="text-warning"><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> <i class="fa fa-star-half-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i></h3>
+        &nbsp; &nbsp;
+        <h5>1200 star rating  and 250 reviews</h5>
+      </div>
+       -->
+
+       <hr>
+
+      <div  class="row">
+      <ul>
+        <div id =  "container"></div>
+      </ul>  
+      </div>
+      <!--
+      <div class="row mt-4">
+        <h3 class="text-info"><i class="fa fa-map-marker" aria-hidden="true"></i></h3>
+        <p style="font-size: 20px"> &nbsp; Delivery by23 Jul, Tuesday | &nbsp; <span class="text-success">FREE</span> </p>
+      </div>
+      -->
+      <hr>
+      
+      <div id="size" class="row mt-4">
+        <h6>Size: &nbsp; &nbsp;</h6>
+        <div class="dropdown show">
+            <select class="form-control">
+                <option value="one">Small</option>
+                <option value="two">Medium</option>
+                <option value="three">Large</option>
+            </select>
+      </div>
+      </div>
+
+      <div id="size" class="row mt-4">
+        <h6>Colour: &nbsp; &nbsp;</h6>
+        <div class="dropdown show">
+            <select class="form-control">
+                <option value="one">Red</option>
+                <option value="two">Blue</option>
+                <option value="three">Black</option>
+            </select>
+        </div>
+      </div>
+
+      <div id="size" class="row mt-4">
+        <h6> Quantity: &nbsp; &nbsp;</h6>
+        <div class="dropdown show">
+            <select class="form-control">
+                <option value="one">1</option>
+                <option value="two">2</option>
+                <option value="three">3</option>
+            </select>
+        </div>
+      </div>
+
+      <hr>
+
+      <div id="size" class="row mt-4">
+        <!--<a href="#" class="btn btn-success text-light"> Buy Now</a> &nbsp; -->
+        <a href="/addcart/<%= item.stock_id %>" class="btn btn-danger text-light"><i class="fa fa-cart-plus" aria-hidden="true"></i>  Add To Cart</a> <br/><br/>
+      </div>
+
+  </div>
+
+      <!-- SELLER IF NEEDED 
+      <div class="row mt-4">
+      	<h4>Seller: &nbsp; &nbsp;</h4>
+      	<p style="font-size: 18px">G.M Garments </p>
+      </div>
+      -->
+      
+      
+    </div>
+    <% }); %>  
+  </div>
+</div>
+
+
+<div class="container">
+   <div class="row mt-5">
+   	 <h4>Similar Products</h4>
+   </div>
+   <div class="row mt-5">
+    <% rsa.forEach(function(item) { %>
+
+      <div class="col-md-3 col-sm-6">
+             
+        <div class="product-grid"> 
+            <div class="product-image">
+                <a style="display: block;" href="/details/<%= item.stock_id %>">
+                  <img class="pic-1" src="/<%= item.image1 %>">
+                  <img class="pic-2" src="/<%= item.image2 %>">
+                </a>
+
+          
+                <span class="product-new-label">Sale</span>
+                <span class="product-discount-label"><%= item.price %></span>
+            </div>
+          
+            <ul class="rating">
+                <li class="fa fa-star"></li>
+                <li class="fa fa-star"></li>
+                <li class="fa fa-star"></li>
+                <li class="fa fa-star"></li>
+                <li class="fa fa-star disable"></li>
+            </ul>
+            <div class="product-content">
+              <h2 style="font-size: 14px; font-weight: 600;" class="title"> <a href="/details/<%= item.stock_id %>"><%= item.prod_name %></a></h3>
+                <div class="price"><span  style="color: #1d1c1b;">&#8358; </span><%= item.price %>
+                    
+                </div>
+                <a class="add-to-cart" href="/addcart/<%= item.stock_id %>" >+ Add To Cart</a>
+            </div>
+        </div>
+      </div>  
+     <% }); %>  
+</div>
+</div>
+
+
+<!-- Optional JavaScript --> 
+<!-- jQuery first, then Popper.js, then Bootstrap JS --> 
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> 
+
+</body>
+
+<script>
+      var desc = $('#desc').val();
+      var temp = new Array();
+      temp = desc.split(",");
+      var container = document.getElementById("container");
+      temp.forEach(function (text) {
+       var div = document.createElement("li");
+        div.innerText = text;
+        div.classList.add("li-added");
+        container.append(div);
+});
+</script>
+</html>

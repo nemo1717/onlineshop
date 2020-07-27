@@ -11,9 +11,22 @@
 
 <header>
   <style>
+
+
+#bodys {
+      font-family: 'Open Sans', sans-serif;
+      
+    background-image:url('../uploads/bimagesss.jpg');
+    background-attachment:fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+    }
+
     .container-fluid {
         margin: 20px 0px 20px;
     }
+
+    
 
     .orangefont {
         color: #ffc107;
@@ -57,7 +70,7 @@
 </header>
 
 
-  <body>
+  <body id="bodys">
 
   
 
@@ -72,30 +85,23 @@
     
             <form  action="/register" method="post">
               <div class="intro"> 
-                <h1>Register</h1>
-                <h4>Unique Name needed for Login</h4>
-
+                <!--
+                <h1><span style="float: left;" >ttttttt</span>Register</h1>-->
+                <h1 style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; font-size: 18px;">Register</h1>
               <input type="text" id="fname" value="" placeholder="First Name" name="fname" tabindex="1" required/>
               <input type="text" id="lname" value="" placeholder="Last Name " name="lname" tabindex="2" required/>
-              <input type="text" id="bname" value="" placeholder="Unique Name  " name="bname" tabindex="3" required/>
-              <input type="text" id="busname" value="" placeholder="Company Name" name="busname" tabindex="5"/>
-              <div class = sidebside>
+              <input type="text" id="addy" value="" placeholder="Address " name="addy" tabindex="3" required/>
               <input type="text" id="city" value="" placeholder="City" name="city" tabindex="5" required/>
-              <input type="text" id="state" value="" placeholder="State" name="state" tabindex="6" required/>
-              </div >
+              <input type="text" id="state" value="" placeholder="State" name="state" tabindex="7" required/>
               <input type="text" id="country" value="" placeholder="Country" name="country" tabindex="7" required/>
               <input type="text" id="phone" value="" placeholder="Phone Number " name="phone" tabindex="8" required/>
-              <input type="email" id="email" value="" placeholder="Email (required)" name="email" tabindex="9" required/>
+              <input type="email" id="email" value="" placeholder="Email" name="email" tabindex="9" required/>
               <input type="password" id="pass1" value="" placeholder="Password " name="password" tabindex="10" required/>
               <input type="password" id="pass2" value="" placeholder="Confirm Password" name="pass2" tabindex="11" required/>
-              <div class = sidebside>
-              <input type="number" id="size" value="" placeholder="Company Size" name="size" tabindex="12"/>
-              <input type="text" id="website" value="" placeholder="Company Website " name="website" tabindex="13"/>
-              </div >
 
               <p class="lead mt-4"><h5>Have An Account? <a href="/login">Login</a></h5></p>
 
-              <button id="register" type="submit" class="btn btn-primary btn-block">Submit Product</button>
+              <button id="register" type="submit" style="background-color: green;"  class="btn btn-primary btn-block">Register</button>
             </form>
           </div>
             </main>

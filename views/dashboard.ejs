@@ -12,6 +12,14 @@
     <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
     <style>
+
+body {
+  padding: 0 2em;
+  font-family: Arial, sans-serif;
+  background: #f2f4fa;
+  font-size: calc(0.75em + 1vmin);
+}
+
         .container-fluid {
             margin: 20px 0px 20px;
         }
@@ -61,6 +69,26 @@
             font-weight: 500;
 
         }
+
+
+
+    @media only screen and (max-width: 768px) {
+        .container  {
+        position: absolute;
+        width: 100%;
+        left: 0;
+        }
+        
+        canvas {
+            height: 320;
+            width: 100%;
+        }
+
+    }
+
+
+
+
     </style>
 </head>
 
@@ -74,7 +102,7 @@
         <input type="hidden" id="prod_name" value="<%= JSON.stringify(prod_name) %>" />
         <input type="hidden" id="stockquantity" value="<%= JSON.stringify(stockquantity) %>" />
         
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <nav  class="navbar navbar-expand-lg navbar-dark bg-dark">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
             </button>
@@ -152,7 +180,7 @@
             </div>
           </nav>
 
-        <div class="row top-row">
+        <div  class="row top-row">
             <div class="col-sm-4">
                 <div class="card bg-light">
                     <div class="card-body text-center">
@@ -162,16 +190,16 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4 no-left-padding">
+            <div class="col-sm-4 ">
                 <div class="card bg-light">
-                    <div class="card-body text-center">
+                    <div  class="card-body text-center">
                         <h3>Previous Year Revenue</h3>
                         <br>
                         <h3 id="valuess"  class="orangefont"><span style="color: #ffc107;">&#8358; </span><%= prevyrsum %></h3 class="orangefont">
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4 no-left-padding">
+            <div class="col-sm-4 ">
                 <div class="card bg-light">
                     <div class="card-body text-center">
                         <h3>Current Year Revenue</h3>
@@ -183,25 +211,25 @@
         </div>
         <hr>
         <div class="row">
-            <div class="col-sm-6">
+            <div id="card" class="col-sm-6">
                 <div class="card bg-light">
                     <canvas id="vertical-bar-chart1" height="320"></canvas>
                 </div>
             </div>
-            <div class="col-sm-6 no-left-padding">
+            <div id="card" class="col-sm-6 ">
                 <div class="card bg-light">
                     <canvas id="vertical-bar-chart2" height="320"></canvas>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-6">
+        <div  class="row">
+            <div id="card" class="col-sm-6">
                 <div class="card bg-light">
                     <canvas id="bar-chart" height="320"></canvas>
                 </div>
             </div>
-            <div class="col-sm-6 no-left-padding">
-                <div class="card bg-light">
+            <div id="card" class="col-sm-6 ">
+                <div class="card bg-light" >
                     <canvas id="pie-chart" height="320"></canvas>
                 </div>
             </div>
@@ -246,7 +274,13 @@
         },
         options: {
 
-          
+            plugins: {
+            datalabels: {
+              display: false,
+            },
+          },
+
+           responsive: true,
             legend: { display: false },
             title: {
                 display: true,
@@ -269,7 +303,13 @@
         },
         options: {
 
+            plugins: {
+            datalabels: {
+              display: false,
+            },
+          },
 
+            display: false,
             legend: { display: false },
             title: {
                 display: true,
@@ -337,5 +377,6 @@
     $("#valuess").digits();
     $("#valuesss").digits();
 </script>
+
 
 </html>

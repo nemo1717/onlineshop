@@ -1,0 +1,33 @@
+<link rel="stylesheet" type="text/css" href="/css/styla.css" />
+
+
+<div class="s-layout">
+
+        
+        <!-- Content -->
+
+<main class="s-layout__content">     
+<div class="section-form">
+  <% include ./partials/messages %>
+                              
+  <% if ( success_messages !='' ) { %>
+    <div class="alert alert-success" >
+        <strong><%= success_messages %> </strong>
+    </div>
+    <% } %>
+    <h4 style="text-align: center; color: red; font-size: 15px"><%= typeof msg != 'undefined' ? msg : '' %></h4>
+        <form  action="/product" method="post" autocomplete="off"  enctype="multipart/form-data">          
+          <div class="intro"> 
+            <h1 style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; font-size: 18px;">Add Product</h1>
+          </div>
+          <input type="text" value="" placeholder="Product Name " name="prod" required/>
+          <!--
+          <input type="file" id="files" name = "MyImage" class="hidden"/>
+          <label for="files">Choose Image</label>
+          -->
+          <textarea placeholder="Product Description" name="description"  rows="10"></textarea>
+          <button type="submit" style="background-color: green;"  class="btn btn-primary btn-block">Submit</button>
+        </form>
+      </div>
+        </main>
+        </div>

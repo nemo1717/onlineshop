@@ -137,7 +137,8 @@ body {
   padding: 0 2em;
   font-family: Arial, sans-serif;
   color: #024457;
-  background: #f2f2f2;
+  background: #f2f4fa;
+  font-size: calc(0.75em + 1vmin);
 }
 
 h1 {
@@ -250,6 +251,20 @@ font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 font-weight: 500;
 
 }
+
+@media only screen and (max-width: 768px) {
+        .container  {
+        position: absolute;
+        width: 100%;
+        left: 0;
+        }
+        
+        canvas {
+            height: 320;
+            width: 100%;
+        }
+
+    }
 
     </style>
 </head>
@@ -375,7 +390,7 @@ font-weight: 500;
                 </div>
             </div>
 
-              <div class="col-sm-4 no-left-padding">
+              <div class="col-sm-4 ">
                 <div class="card bg-light">
                     <div class="card-body text-center">
                         <h4>Previous Year Net Profit</h4>
@@ -385,7 +400,7 @@ font-weight: 500;
                 </div>
             </div>
 
-              <div class="col-sm-4 no-left-padding">
+              <div class="col-sm-4 ">
                   <div class="card bg-light">
                       <div class="card-body text-center">
                           <h5>Current Year Net Profit</h5>
@@ -411,7 +426,7 @@ font-weight: 500;
           </br>
               <div   class="col-sm-6">
                   <div class="card bg-light">
-                      <canvas id="vertical-bar-chart1" height="2000" width="4000"></canvas>
+                      <canvas id="vertical-bar-chart1" height="250" ></canvas>
                   </div>
               </div>
           </div>

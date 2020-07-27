@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://checkout.flutterwave.com/v3.js"></script>
+    <title>Document</title>
+</head>
+
+<style>
+    .form {
+  display: none;
+}
+.form.active {
+  display: block
+}
+
+.billing p{
+
+  font-weight: normal;
+  font-size: 17px;
+  Font-Family: Metric-Regular;
+  Color: #3f3f3f;
+
+}
+
+label {
+  font-weight: normal;
+  font-size: 17px;
+  Font-Family: Metric-Regular;
+  Color: #666666;
+  display: block;
+  cursor: pointer;
+}
+[type="radio"] {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+[type="radio"] + span:after {
+  content: '';
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: -0.10em;
+  border-radius: 1em;
+  border: 0.35em solid #fff;
+  box-shadow: 0 0 0 0.10em #36B18D;
+  margin-left: 0.75em;
+  transition: 0.5s ease all;
+}
+[type="radio"]:checked + span:after {
+  background: #36B18D;
+  box-shadow: 0 0 0 0.10em #36B18D;
+}
+[type="radio"]:focus + span::before {
+  font-size: 1.2em;
+  line-height: 1;
+  vertical-align: -0.125em;
+}
+
+.billing{
+  display: inline;
+}
+
+.billing h4 {
+  background-color: black; color: floralwhite; height: 37px; text-indent: 20px;  line-height: 37px;
+  font-weight: normal;
+  font-size: 16px;
+  Font-Family: Metric-Regular;
+
+}
+
+.billing a {
+  background-color: black; color: rgb(195, 241, 199); height: 37px; text-indent: 20px;  line-height: 37px;
+  font-weight: normal;
+  font-size: 12px;
+  Font-Family: Metric-Regular;
+
+}
+
+footer {
+	background-color: #000000;
+	font-size: 0;
+	width: 100%;
+	-webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.4);
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+footer p {
+	font-family: Corbel;
+	color: #f5f2f1;
+	font-weight: 400;
+	font-size: 16px;
+	width: 10%;
+	display: inline-block;
+	text-align: center;
+}
+
+footer .copy-right {
+	width: 100%;
+	text-align: left;
+	padding-left: 4rem;
+}
+
+@media only screen and (max-width: 920px) {
+	footer p {
+		width: 100%;
+		text-align: center;
+		margin-bottom: 0.4rem;
+	}
+	footer .copy-right {
+		width: 100%;
+		text-align: center;
+		margin-left: -2.2rem;
+	}
+}
+
+small .text-muted {
+  color: green;
+}
+
+
+
+
+</style>
+<body>
+  <% include ./navis %>
+
+  <br>
+  <br>
+
+    <div class="container">
+
+      <input type="hidden" id="fullname" value="<%= JSON.stringify(fullname) %>" />
+      <input type="hidden" id="email" value="<%= JSON.stringify(email) %>" />
+      <input type="hidden" id="token" value="<%= JSON.stringify(token) %>" />
+      <input type="hidden" id="ids" value="<%= JSON.stringify(ids) %>" />
+      <input type="hidden" id="phone" value="<%= JSON.stringify(phone) %>" />
+      <input type="hidden" id="total" value="<%= JSON.stringify(total) %>" />
+      <input type="hidden" id="addy" value="<%= JSON.stringify(adi.addy_id) %>" />
+      
+
+      
+        <div class="row">
+          <div class="col-md-4 order-md-2 mb-4">
+            <h4 class="d-flex justify-content-between align-items-center mb-3">
+              <span class="text-muted">Your cart</span>
+              <span class="badge badge-secondary badge-pill"><%= lengths %></span>
+            </h4>
+            <% data.forEach(function(item) { %>
+            <ul class="list-group mb-3">
+              <li class="list-group-item d-flex justify-content-between lh-condensed">
+                <div>
+                  <h6 class="my-0"><%= item.prod_name %></h6>
+                 <!-- <small class="text-muted">Brief description</small> -->
+                </div>
+                <span  class="text-muted"><span  style="color: #1d1c1b;">&#8358; </span><%= item.price %></span>
+              </li>
+      <!--
+              <li class="list-group-item d-flex justify-content-between bg-light">
+                <div class="text-success">
+                  <h6 class="my-0">Promo code</h6>
+                  <small>EXAMPLECODE</small>
+                </div>
+                <span class="text-success">-$5</span>
+              </li>
+              -->
+              <% }); %> 
+              <li class="list-group-item d-flex justify-content-between">
+                <span>Total (USD)</span>
+                <strong ><%= total %></strong>
+              </li>
+            </ul>
+
+            <!--
+            <form class="card p-2">
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="Promo code">
+                <div class="input-group-append">
+                  <button type="submit" class="btn btn-secondary">Redeem</button>
+                </div>
+              </div>
+            </form>
+            -->
+          </div>
+      
+
+          <div class="col-md-8 order-md-1">
+            <div class="billing" >
+            <h4  class="mb-3" >Mailing address <span style="float: right; margin-right: 10px; font-size:16px; font-weight: lighter; "><a href="/address">Edit Mailing Address</a></span></h4>
+            <p style="margin-bottom: 4px;"><strong>Name: </strong> <span><%= users.lname %>, <%= users.fname %></span></p>
+            <p style="margin-bottom: 4px;"><strong>Email: </strong> <span><%= users.email %></span></p>
+            <p style="margin-bottom: 4px;"><strong>Phone: </strong><span><%= users.phone %></span></p>
+            <p style="margin-bottom: 4px;"><strong>Address: </strong> <span><%= adi.address %></span></p>
+            <p style="margin-bottom: 4px;"><strong>City: </strong> <span><%= adi.city %></span></p>
+            <p style="margin-bottom: 4px;"><strong>State: </strong> <span><%= adi.state %></span></p>
+            <p style="margin-bottom: 4px;"><strong>Country: </strong> <span><%= adi.country %></span></p>
+          </div>
+           
+              <hr class="mb-4">
+              <div class="billing" >
+              <h4 class="mb-3"  >Payment</h4>
+              </div>
+              <div class="d-block my-3">
+                
+                <label style="margin-bottom: 15px;"><input type="radio" class="form-switch" name="colorCheckbox" value="red" data-id="a" checked> <span>Pay Now with Debit Card Payment</span></label>
+                
+                <label style="margin-bottom: 19px;"><input type="radio" class="form-switch" name="colorCheckbox" value="green" data-id="b"> <span>Contact Us on Whatsapp Before Payment<small style="color: green; font-weight: bolder;" class="text-muted"> (Click Whatsapp Image Below)</small></span></label>
+                
+              </div>
+
+              <div class="form form-a active">
+                <button style="background-color: green;"  class="btn btn-primary btn-block" type="submit" onClick="makePayment()" >Proceed with Secure Payment</button>
+              </div>
+
+              <form class="needs-validation" novalidate>
+              <div class="form form-b">
+
+                <br>
+                <a href="https://api.whatsapp.com/send?phone=13474585774"><img src="/images/wts.png"></a>
+
+               
+              <!--
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="cc-name">Whatsapp Phone Number</label>
+                  <input type = "text" class="form-control" id="cc-name" placeholder="" required>
+                  <small class="text-muted">phone number require</small>
+                  <div class="invalid-feedback">
+                    phone number require
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="cc-number">Full Name</label>
+                  <input type="text" class="form-control" id="cc-number" placeholder="" required>
+                  <small class="text-muted">full name required</small>
+                  <div class="invalid-feedback">
+                    Full Name Required
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-3 mb-3">
+                  <label for="cc-expiration">Expiration</label>
+                  <input type="text" class="form-control" id="cc-expiration" placeholder="" required>
+                  <div class="invalid-feedback">
+                    Expiration date required
+                  </div>
+                </div>
+     
+              </div>
+              <div class="form form-c"> form c</div>
+              <hr class="mb-4">
+              <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to checkout</button>
+
+
+              -->  
+              </div>
+
+
+         
+              
+            </form>
+          </div>
+    </div>
+      
+
+      </div> 
+
+
+
+
+</body>
+<script>
+ $(document).ready(function() {
+  $('.form-switch').on('change', function() {
+    $('.form').removeClass('active');
+    var formToShow = '.form-' + $(this).data('id');
+    $(formToShow).addClass('active');
+  });
+});
+</script>
+
+
+<script>
+
+  var email = $('#email').val();
+  email = JSON.parse(email);
+
+  var phone = $('#phone').val();
+    phone = JSON.parse(phone);
+
+    var fullname = $('#fullname').val();
+    fullname = JSON.parse(fullname);
+
+    var total = $('#total').val();
+    total = JSON.parse(total);
+
+    var token = $('#token').val();
+    token = JSON.parse(token);
+
+    var ids = $('#ids').val();
+    ids = JSON.parse(ids);
+
+    
+   var addy = $('#addy').val();
+  addy = JSON.parse(addy);
+
+
+
+
+
+  function makePayment() {
+    FlutterwaveCheckout({
+      public_key: "FLWPUBK_TEST-d6db401ee111c36c90e46611fc977669-X",
+      tx_ref: token,
+      amount: total,
+      currency: "NGN",
+      payment_options: "card,mobilemoney,ussd",
+      redirect_url: "http://localhost:3000/sucess",
+       // "https://callbacks.piedpiper.com/flutterwave.aspx?ismobile=34"
+      meta: {
+        consumer_id: ids,
+        consumer_mac: "92a3-912ba-1192a",
+      },
+      customer: {
+        email: email,
+        phone_number: phone,
+        name: fullname,
+      
+      },
+      callback: function (data) {
+        console.log(data);
+      },
+      customizations: {
+        title: "My store",
+        description: "Payment for items in cart",
+        logo: "https://assets.piedpiper.com/logo.png",
+      },
+    });
+  }
+</script>
+
+<footer style="background-color:#595959; margin-top: 30px; width: 100%; ">
+  <p class="copy-right"><img src="https://res.cloudinary.com/de8cuyd0n/image/upload/v1520412543/E-commerce%20landing%20page/icons/copy-right-img_1x.png" alt="copy right image" /> 2017 all right recived </p>
+
+</footer>
+
+</html>

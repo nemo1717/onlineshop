@@ -1,0 +1,28 @@
+<link rel="stylesheet" type="text/css" href="/css/styla.css" />
+
+
+<div class="s-layout">
+
+        
+        <!-- Content -->
+
+<main class="s-layout__content">     
+<div class="section-form">
+  <% include ./partials/messages %>
+                              
+  <% if ( success_messages !='' ) { %>
+    <div class="alert alert-success" >
+        <strong><%= success_messages %> </strong>
+    </div>
+    <% } %>
+
+        <form  action="/size" method="post">
+          <div class="intro"> 
+            <h1 style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; font-size: 18px;">Add Size</h1>
+          </div>
+          <input type="text" value="" placeholder="Size " name="size" required/>
+          <button type="submit" style="background-color: green;"  class="btn btn-primary btn-block" >Submit</button>
+        </form>
+      </div>
+        </main>
+        </div>

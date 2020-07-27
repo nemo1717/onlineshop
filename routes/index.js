@@ -12,18 +12,32 @@ var moment = require('moment');
 var request = require('request');
 var http = require('http');
 var fs = require('fs');
+var bodyParser = require('body-parser');
+const multerStorage = multer.memoryStorage();
+var request = require('request');
+var unirest = require("unirest");
+
+
 
 
 // Mysql connectionString
 var mysql = require('mysql');
+const { connected } = require('process');
 var db = mysql.createPool({
-  host: 'layanenterprises.cjajxkvdxg0f.us-east-2.rds.amazonaws.com',
-  user: 'layanent',
-  password: 'Layangrade17',
-  database: 'layanenterprises',
+  host: 'sodiq-enterprises.c56ky9ttj1zp.us-east-2.rds.amazonaws.com',
+  user: 'root',
+  password: 'Bestlayan17',
+  database: 'sodiq_business',
   multipleStatements: true
 
 });
+
+ // var SEC_KEY = "FLWSECK_TEST-a561248cfe957b17d837355087faeca4-X";
+
+
+ 
+ 
+
 
 
 http.createServer(function (req, res) {
@@ -40,9 +54,228 @@ router.get('/', function (req, res, next) {
   res.redirect('/homepage');
 });
 
-// test nav
+router.get('/sucess', function (req, res, next) {
+  var stockid = [];
+  var cartid = [];
+  //var addy = 0;
+  var options = {
+    'method': 'GET',
+    'url': 'https://api.flutterwave.com/v3/transactions',
+    'headers': {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer FLWSECK_TEST-a561248cfe957b17d837355087faeca4-X'
+    }
+  };
+
+  async.waterfall([
+    function (done) {
+      request(options, function (error, response) { 
+        if (error) throw new Error(error);
+        var datas  = response.body;
+        console.log(response.body);
+        
+        //var customer  = response.card;
+        var daty = JSON.parse(datas);
+       //var cust = JSON.parse(customer);
+        //console.log(daty)
+      
+   
+        var cust_id = daty.data[0].meta.consumer_id;
+       // var addy = daty.data[0].meta.consumer_mac;
+       
+       
+        //console.log(daty.data[0].amount);
+    
+        done(error, cust_id);
+      });
+    },
+
+    function (cust_id, done) {
+      crypto.randomBytes(10, function (err, buf) {
+        var order_id = buf.toString('hex');
+  
+
+  
+      //var stockid = [];
+      cust_id = parseInt(cust_id);
+      order_id = order_id.toString();
+
+      db.query("select address.addy_id, address.address, address.city, address.state, address.country from customer join address on customer.id = address.cust_id where address.cust_id = ? order by address.addy_id desc limit 1; " , [cust_id], function (err, rss) {
+        if (err) {
+          console.log(err);
+        }
+        else {
+          var addy_id = rss[0].addy_id
+        db.query("Insert into `order`(order_id, cust_id, addy_id) values ('" + order_id + "','" + cust_id + "', '" + addy_id + "');" , function (err, rs) {
+          if (err) {
+            console.log(err);
+          }
+          else {
+            db.query('SELECT * FROM  cart where user_id = ?;',[cust_id],  function (err, rs) {
+              if (err) {
+                console.log(err);
+              }
+              else {
+                rs.map(data =>{
+                  stockid.push(data.stock_id)
+                  cartid.push(data.cart_id);
+                });
+                for(i = 0; i < stockid.length; i++){
+                  db.query("insert into order_detail( order_id, stock_id) values ('" + order_id + "','" + stockid[i] + "') ;",  function (err, rs) {
+                    if (err) {
+                      console.log(err);
+                    }
+                  });
+                }
+
+                for(i = 0; i < cartid.length; i++){
+                  console.log(cartid);
+                      db.query("DELETE FROM cart where cart_id = ?;", [cartid[i]],  function (err, rs) {
+                        if (err) {
+                          console.log(err)
+                        }
+                        else{
+                          console.log('deleted');
+                        }
+                      });
+                }
+                
+              }
+            });
+          }
+        });
+      }
+      });
+    });
+    }
+  ]);
+  res.redirect('/cart');
+});
+
+// test 
 router.get('/navy', function (req, res, next) {
   res.render('navy');
+});
+
+// checkout
+router.get('/checkout', ensureAuthenticated, function (req, res, next) {
+  var fname = "";
+  var lname = "";
+  var prices = [];
+  
+  db.query('SELECT * FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id  left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id  left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id  left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id  left join sodiq_business.gender on  sodiq_business.stock.gender_id = sodiq_business.gender.gender_id left join sodiq_business.product_type on  sodiq_business.product_type.p_type_id = sodiq_business.stock.p_type_id  left join cart on stock.stock_id = cart.stock_id where cart.user_id = ?; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3; select address.addy_id, address.address, address.city, address.state, address.country from customer join address on customer.id = address.cust_id where address.cust_id = ? order by address.addy_id desc limit 1; ',[req.user.id, req.user.id],  function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      var total = 0;
+     
+      if(req.user) {
+        fname = req.user.fname;
+        lname= req.user.lname;
+        }
+
+        rs[0].map(data => {
+         price =  parseInt(data.price);
+          prices.push(price); 
+
+        });
+
+        var email = req.user.email
+        var phone = req.user.phone
+        var fullname = lname + " " + fname;
+        var ids = req.user.id;
+
+        console.log(email, phone, fullname);
+
+        var adi = rs[4][0];
+        console.log(adi.state);
+       // console.log(rs[4][0].state);
+        
+        total = prices.reduce((a, b) => a + b, 0);
+        
+        var lengths = rs[0].length;
+        console.log(lengths);
+        var users = req.user;
+
+        // tx_ref generator
+        var token = crypto.randomBytes(15);
+        token = token.toString('hex');
+      //console.log(token);
+        console.log(token); 
+   
+      res.render('checkout', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3],  lname:lname, fname:fname, ids:ids, total:total, users:users, lengths:lengths, email:email, fullname:fullname, phone:phone, adi:adi, token:token})
+    }
+  });
+});
+
+router.get('/address', function (req, res, next) {
+  res.render('address');
+});
+
+router.post('/address', function (req, res, next) {
+  const {address, city, state, country} = req.body
+  db.query("Insert into `address`(cust_id, address, city, state, country) values ('" + req.user.id + "', '" + address + "', '" + city + "', '" + state + "', '" + country + "');", function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      res.redirect('/checkout');
+    }
+  });
+});
+
+
+
+
+// profile
+router.get('/profile', function (req, res, next) {
+  db.query("SELECT * FROM sodiq_business.customer where id = ?;  SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3;", [req.user.id], function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+
+      var fname = req.user.fname;
+      var lname= req.user.lname;
+
+
+      res.render('profile', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3], lname:lname, fname:fname})
+    }
+  });
+});
+
+
+// nav not logged in
+router.get('/navi', function (req, res, next) {
+
+  db.query("SELECT * FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id  left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id  left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id  left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id order by quantity desc Limit 4;  SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3;", function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+
+      res.render('navi', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3]})
+    }
+  });
+});
+
+//nav logged 
+
+router.get('/navis', function (req, res, next) {
+
+  db.query("SELECT * FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id  left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id  left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id  left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id order by quantity desc Limit 4; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3;", function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      console.log(rs[3]);
+      var fname = req.user.fname;
+      var lname= req.user.lname;
+
+      res.render('navis', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3], lname:lname, fname:fname})
+    }
+  });
 });
 
 
@@ -51,46 +284,671 @@ router.get('/navy', function (req, res, next) {
 
 //test mysql connection
 router.get('/testconn', function (req, res, next) {
+  
   if (db != null) {
+    crypto.randomBytes(10, function (err, buf) {
+      var order_id = buf;
+      console.log(order_id);
+    });
+
     res.send('it is connected');
   }
   else {
+ 
     res.send('connect fail');
   }
 });
+
+// homepage shop
+
+router.get('/myaccount', ensureAuthenticated, function (req, res, next) {
+  db.query("SELECT * FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id  left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id  left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id  left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id order by quantity desc Limit 4; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3;", function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+
+      /*
+      var group_to_values = rs.reduce(function (obj, item) {
+        obj[item.prod_id] = obj[item.prod_id] || [];
+        obj[item.prod_id].push(item.price);
+        return obj;
+    }, {});
+    console.log(group_to_values );
+    */
+
+   var fname = req.user.fname;
+   var lname= req.user.lname;
+
+      res.render('myaccount', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3], lname:lname, fname:fname})
+    }
+  });
+});
+
+router.get('/homeshop', function (req, res, next) {
+
+  db.query("SELECT * FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id  left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id  left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id  left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id order by quantity desc Limit 4; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3;", function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+
+      /*
+      var group_to_values = rs.reduce(function (obj, item) {
+        obj[item.prod_id] = obj[item.prod_id] || [];
+        obj[item.prod_id].push(item.price);
+        return obj;
+    }, {});
+    console.log(group_to_values );
+    */
+
+      res.render('homeshop', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3]})
+    }
+  });
+});
+
+router.get('/product_type/:gender/:token', function (req, res, next) {
+  var fname = "";
+  var lname = "";
+  db.query("SELECT * FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id  left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id  left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id  left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id  left join sodiq_business.gender on  sodiq_business.stock.gender_id = sodiq_business.gender.gender_id left join sodiq_business.product_type on  sodiq_business.product_type.p_type_id = sodiq_business.stock.p_type_id where product_type = ? and gender = ? ;  SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3;", [req.params.token, req.params.gender], function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+
+      if(req.user) {
+      fname = req.user.fname;
+      lname= req.user.lname;
+      }
+
+      res.render('homes', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3],  lname:lname, fname:fname})
+    }
+  });
+});
+
+router.get('/searches', function (req, res, next) {
+  var fname = "";
+  var lname = "";
+  console.log(req.query.keyss);
+  db.query('SELECT * FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id  left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id  left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id  left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id  left join sodiq_business.gender on  sodiq_business.stock.gender_id = sodiq_business.gender.gender_id left join sodiq_business.product_type on  sodiq_business.product_type.p_type_id = sodiq_business.stock.p_type_id where Concat(gender, product_type, color_name, prod_name, price, size, cat_name) like "%'+req.query.keyss+'%" ;  SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3;',  function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      if(req.user) {
+        fname = req.user.fname;
+        lname= req.user.lname;
+        }
+      
+      res.render('homes', { data:rs[0], men:rs[1], women:rs[2], kid:rs[3],  lname:lname, fname:fname})
+    }
+  });
+});
+
+router.get('/homes', function (req, res, next) {
+  var fname = "";
+  var lname = "";
+  db.query("SELECT * FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id  left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id  left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id  left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id ;    SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3;", function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+
+
+  //var result = new Array();
+  //.reduce(function(res, value) {
+    //  res[value.image] = { image: value.image };
+     // result.push(res[value.image])
+      
+ // return res;
+//}, {});
+//console.log(result);
+
+
+
+
+rs.forEach(function(item){
+  console.log(item.image);
+})
+
+
+     // var str = rs
+      //var imag = str.image
+     // var temp = new Array();
+     // temp = str.split(",");
+    //  console.log(temp);
+      //console.log(str);
+      if(req.user) {
+        fname = req.user.fname;
+        lname= req.user.lname;
+        }
+      res.render('homes',{data:rs[0], men:rs[1], women:rs[2], kid:rs[3], lname:lname, fname:fname})
+    }
+  });
+});
+
+// product page
+router.get('/product_page', function (req, res, next) {
+  var fname = "";
+  var lname = "";
+  var categorys = ""
+  db.query("SELECT *, sodiq_business.stock.description as descr FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id  left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id  left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id  left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id;   SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3;", function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+     
+     // var str = rs[0].descr
+   //  var temp = new Array();
+    //  temp = str.split(",");
+      
+
+    if(req.user) {
+      fname = req.user.fname;
+      lname= req.user.lname;
+      }
+     
+      res.render('product_page.ejs', {  data:rs[0], men:rs[1], women:rs[2], kid:rs[3], lname:lname, fname:fname});
+    }
+  });
+});
+
+
+router.get('/details/:token', function(req, res) {
+  var fname = "";
+  var lname = "";
+  var categorys = [];
+  var stockid = req.params.token;
+
+  db.query('SELECT *, sodiq_business.stock.description as descr FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id where sodiq_business.stock.stock_id = ? ;  SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3; ',[req.params.token] ,function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+     
+      //var str = rs[0].descr
+     // var temp = new Array();
+     // temp = str.split(",");
+     // console.log(str);
+  
+     
+  
+    
+     if(req.user) {
+      fname = req.user.fname;
+      lname= req.user.lname;
+
+      }
+      
+    
+  
+
+
+    // rs[0].forEach(function(item) {
+    //   console.log(item.cat_id)
+      
+     // });
+
+          //get max year
+    rs[0].map(data => {
+      categorys.push(data.cat_id)
+    })
+    console.log(categorys);
+
+      var cat =  parseInt(categorys)
+      console.log(cat);
+      
+      console.log(stockid);
+      db.query('SELECT *, sodiq_business.stock.description as descr FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id where stock.cat_id = ? and stock.stock_id != ? order by stock.quantity desc limit 4 ',[cat, stockid] ,function (err, rsa) {
+        if (err) {
+          console.log(err);
+        }
+
+        
+        res.render('product_page.ejs', { data:rs[0], men:rs[1], women:rs[2], kid:rs[3], lname:lname, fname:fname, rsa:rsa });
+        
+      });
+    
+    }
+  });
+});
+
+// cart
+
+router.get('/cart', ensureAuthenticated,  function (req, res, next) {
+  var fname = "";
+  var lname = "";
+  
+  db.query('SELECT * FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id  left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id  left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id  left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id  left join sodiq_business.gender on  sodiq_business.stock.gender_id = sodiq_business.gender.gender_id left join sodiq_business.product_type on  sodiq_business.product_type.p_type_id = sodiq_business.stock.p_type_id  left join cart on stock.stock_id = cart.stock_id where cart.user_id = ?;  SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3;',[req.user.id],  function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      if(req.user) {
+        fname = req.user.fname;
+        lname= req.user.lname;
+        }
+      res.render('cart', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3],  lname:lname, fname:fname})
+    }
+  });
+});
+
+
+
+router.get('/remove-cart/:token',   function (req, res, next) {
+  console.log(req.params.token);
+  db.query('delete from cart where cart_id = ? ', [req.params.token],  function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      req.flash('success_msg', 'Cart Successfully Removed')
+      res.redirect('/cart');
+    }
+  });
+});
+
+router.get('/addcart/:stockid', function (req, res, next) {
+  console.log(req.param.stockid);
+
+  if(!req.user) {
+
+    req.flash('error', 'please login or create account to start shopping')
+    res.redirect('/login');
+
+  }
+
+  else if(req.user){
+  db.query("Insert into cart(stock_id, user_id) values ('" + req.params.stockid + "', '" + req.user.id + "') ",function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+     req.flash('success_msg', 'product Successfully added to your cart. continue shopping or check cart')
+     res.redirect('/homes');
+    }
+  });
+}
+});
+
+router.get('/addcartp/:stockid', function (req, res, next) {
+  console.log(req.param.stockid);
+
+  if(!req.user) {
+
+    req.flash('error', 'please login or create account to start shopping')
+    res.redirect('/login');
+
+  }
+
+  else if(req.user){
+  db.query("Insert into cart(stock_id, user_id) values ('" + req.params.stockid + "', '" + req.user.id + "') ",function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+     req.flash('success_msg', 'product Successfully added to your cart')
+     res.redirect('/homes');
+    }
+  });
+}
+});
+
+// category
+router.get('/category',   function (req, res, next) {
+  res.render('category');
+});
+
+router.post('/category', function (req, res, next) {
+  const { cat_name,  description } = req.body;
+   // const full_name = req.user.first_name + ' ' + req.user.last_name;
+   // var names = name.replace(/\s+/g, ' ');
+    db.query("insert into category(cat_name, description) values ('" + cat_name + "', '" + description + "')", function (err, rs) {
+      if (err) {
+        console.log(err);
+        req.flash('error', 'Error: Supplier not Inserted')
+        res.redirect('/category');
+      }
+      else {
+        req.flash('success_msg', 'Category Successfully Added')
+        res.redirect('/category');
+      }
+    });
+});
+
+
+// add color
+router.get('/color',   function (req, res, next) {
+  res.render('color');
+});
+
+router.post('/color', function (req, res, next) {
+  const { color } = req.body;
+   // const full_name = req.user.first_name + ' ' + req.user.last_name;
+   // var names = name.replace(/\s+/g, ' ');
+    db.query("insert into color(color_name) values ('" + color + "')", function (err, rs) {
+      if (err) {
+        console.log(err);
+        req.flash('error', 'Error: Color not Inserted')
+        res.redirect('/color');
+      }
+      else {
+        req.flash('success_msg', 'Color Successfully Added')
+        res.redirect('/color');
+      }
+    });
+});
+
+// add gender
+router.get('/gender',   function (req, res, next) {
+  res.render('gender');
+});
+
+router.post('/gender', function (req, res, next) {
+  const { gender } = req.body;
+   // const full_name = req.user.first_name + ' ' + req.user.last_name;
+   // var names = name.replace(/\s+/g, ' ');
+    db.query("insert into gender(gender) values ('" + gender + "')", function (err, rs) {
+      if (err) {
+        console.log(err);
+        req.flash('error', 'Error: Gender not Inserted')
+        res.redirect('/gender');
+      }
+      else {
+        req.flash('success_msg', 'Gender Successfully Added')
+        res.redirect('/gender');
+      }
+    });
+});
+
+
+// add product type
+router.get('/product_type',   function (req, res, next) {
+  db.query("Select * from gender", function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      res.render('product_type', {data:rs});
+    }
+  });
+});
+
+router.post('/product_type', function (req, res, next) {
+  var gender_id = 0
+  const { product_type } = req.body;
+   // const full_name = req.user.first_name + ' ' + req.user.last_name;
+   // var names = name.replace(/\s+/g, ' ');
+   /*
+   db.query("Select * from gender where gender = ?", [gender], function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      
+      gender_id = rs[0].gender_id;
+      console.log(gender_id);
+      */
+
+    db.query("insert into product_type(product_type) values ('" + product_type + "')", function (err, rs) {
+      if (err) {
+        console.log(err);
+        req.flash('error', 'Error: Product Type not Inserted')
+        res.redirect('/product_type');
+      }
+      else {
+        req.flash('success_msg', 'Product Type Successfully Added')
+        res.redirect('/product_type');
+      }
+    });
+});
+
+// Add Size
+router.get('/size',   function (req, res, next) {
+  res.render('size');
+});
+
+router.post('/size', function (req, res, next) {
+  const { size } = req.body;
+   // const full_name = req.user.first_name + ' ' + req.user.last_name;
+   // var names = name.replace(/\s+/g, ' ');
+    db.query("insert into size(size) values ('" + size + "')", function (err, rs) {
+      if (err) {
+        console.log(err);
+        req.flash('error', 'Error: Size not Inserted')
+        res.redirect('/size');
+      }
+      else {
+        req.flash('success_msg', 'Size Successfully Added')
+        res.redirect('/size');
+      }
+    });
+});
+
+// Add description
+// Add Size
+router.get('/description',   function (req, res, next) {
+  res.render('description');
+});
+
+router.post('/description', function (req, res, next) {
+  const { description } = req.body;
+   // const full_name = req.user.first_name + ' ' + req.user.last_name;
+   // var names = name.replace(/\s+/g, ' ');
+    db.query("insert into description(description) values ('" + description + "')", function (err, rs) {
+      if (err) {
+        console.log(err);
+        req.flash('error', 'Error: Description not Inserted')
+        res.redirect('/description');
+      }
+      else {
+        req.flash('success_msg', 'Description Successfully Added')
+        res.redirect('/description');
+      }
+    });
+});
+
+
+
+
+
+// picture upload with multer
+//set storage
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+// Init Upload
+const upload = multer({
+  storage: storage,
+  limits:{fileSize: 1000000000},
+  fileFilter: function(req, file, cb){
+    checkFileType(file, cb);
+  }
+}).array('photos', 10);
+
+function checkFileType(file, cb) {
+  // Allowed ext
+  const filetypes = /jpeg|jpg|png|gif/;
+  // Check ext
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+  // Check mime
+  const mimetype = filetypes.test(file.mimetype);
+
+  if (mimetype && extname) {
+    return cb(null, true);
+  } else {
+    cb('Error: Images Only!');
+  }
+}
+
+
+
+
+
+// poduct
+
+
+router.get('/product',   function (req, res, next) {
+  res.render('product');
+});
+
+router.post('/product', function (req, res, next) {
+  upload(req, res, (err) => {
+  const { prod, description} = req.body;
+   // const full_name = req.user.first_name + ' ' + req.user.last_name;
+   // var names = name.replace(/\s+/g, ' ');
+   if(err){
+    res.render('product', {
+      msg: err
+    });
+  }
+  else {
+    db.query("insert into product(prod_name,  description) values ('" + prod + "',  '" + description + "')", function (err, rs) {
+      if (err) {
+        console.log(err);
+        req.flash('error', 'Error: Product not Inserted')
+        res.redirect('/product');
+      }
+      else {
+        req.flash('success_msg', 'Product Successfully Added')
+        res.redirect('/product');
+      }
+    });
+  }
+  });
+});
+
+
+
+//tes picture
+
+
+router.get('/tes',    function (req, res, next) {
+      res.render('tes');
+});
+
+router.post('/tes',    function (req, res, next) {
+  upload(req, res, (err) => {
+
+    var files = [];
+    var fileKeys = req.files;
+    fileKeys.forEach(function(key) {
+      files.push(key.filename);
+    });
+    console.log(files);
+
+  
+});
+});
+
+
+
+
 
 
 
 
 // Add Products
 
-router.get('/add_product', ensureAuthenticated, function (req, res, next) {
-  db.query(" Select * from category where clientid = ?",  [req.user.clientid],  function (err, rs) {
+router.get('/add_product',    function (req, res, next) {
+  db.query(" Select * from category; select * from supplier ; select * from color ; select * from size ; select * from product ; select * from description ; select * from gender ; select * from product_type ;  " ,  function (err, rs) {
     if (err) {
       console.log(err);
     }
     else {
-      res.render('add_product' , { categ:rs });
+      res.render('add_product' , { categ:rs[0], supp:rs[1], size:rs[3], color:rs[2], product:rs[4], description:rs[5], product_type:rs[7], gender:rs[6] });
     }
   });
 });
 
-router.post('/add_product', function (req, res, next) {
-  const { pname, cat, quant, price, description } = req.body;
+router.post('/add_product',  function (req, res, next) {
+  upload(req, res, (err) => {
+  const { prod, sup, color, size , cat, quant, price, description, gender, ptype} = req.body;
   var catid = 0;
+  var supid = 0;
+  var prodid = 0;
+  var sizeid = 0;
+  var colorid = 0;
+  var genderid = 0;
+  var ptypeid = 0;
+  var descriptionid = 0;
+  var pics = 0;
+  var pic1 = 0;
+  var pic2 = 0;
+  var pic3 = 0;
+  var pic4 = 0;
 
-    db.query("select * from category where cat_name = ? and clientid = ? ", [cat, req.user.clientid ], function (err, rs) {
+  if(req.files.length == 1  ) {
+    pic1 = req.files[0].filename;
+  }
+  
+  else if (req.files.length == 2){
+    pic1 = req.files[0].filename;
+    pic2 = req.files[1].filename;
+  }
+  
+  else if (req.files.length == 3){
+    pic1 = req.files[0].filename;
+    pic2 = req.files[1].filename;
+    pic3 = req.files[2].filename;
+  }
+  
+  else if (req.files.length == 4){
+      pic1 = req.files[0].filename;
+      pic2 = req.files[1].filename;
+      pic3 = req.files[2].filename;
+      pic4 = req.files[3].filename;
+  }
+
+  else{
+
+    pics = 0;
+
+  }
+
+
+
+
+  console.log(pic1 + "," + pic2  + "," + pic3  + "," + pic4 );
+  //var pnames = pname.replace(/\s+/g, ' ');
+  //console.log(pnames); 
+
+  if(err){
+    res.render('product_page', {
+      msg: err
+    });
+  }
+  else {
+
+    var files = [];
+    var fileKeys = req.files;
+    fileKeys.forEach(function(key) {
+      files.push(key.filename);
+    });
+ 
+
+    db.query("select * from category where cat_name = ?; select * from supplier where sup_name = ?; select * from product where prod_name = ? ; select * from color where color_name = ?; select * from size where size = ?; select * from gender where gender = ?; select * from product_type where product_type = ?; ", [cat, sup, prod, color, size, gender, ptype  ], function (err, rs) {
       if (err) {
         console.log(err);
       }
       else{
-        if(cat) {
-          catid = rs[0].cat_id;
-          console.log(catid);
-        }
-        console.log(catid);
-        const full_name = req.user.first_name + ' ' + req.user.last_name;
-        db.query("insert into Products(prod_name , categoryid , stockquantity, unitprice, description, clientid, add_by) values ('" + pname + "','" + catid + "', '" + quant + "', '" + price + "','" + description + "','" + req.user.clientid + "','" + full_name + "')", function (err, rs) {
+      catid = rs[0][0].cat_id;
+      supid = rs[1][0].sup_id;
+      prodid = rs[2][0].prod_id;
+      colorid = rs[3][0].color_id;
+      sizeid = rs[4][0].size_id;
+      genderid = rs[5][0].gender_id;
+      ptypeid = rs[6][0].p_type_id;
+
+       // const full_name = req.user.first_name + ' ' + req.user.last_name;
+        db.query("insert into stock(prod_id , cat_id , sup_id, color_id, size_id, price, image1,  image2, image3,  image4, quantity, description, gender_id, p_type_id) values ('" + prodid + "', '" + catid + "' , '" + supid + "', '" + colorid + "', '" + sizeid + "', '" + price + "',  '" + pic1 + "', '" + pic2 + "', '" + pic3 + "', '" + pic4 + "', '" + quant + "','" + description + "', '" + genderid + "', '" + ptypeid + "')", function (err, rs) {
           if (err) {
             console.log(err);
             req.flash('error', 'Error: Product not Inserted');
@@ -103,11 +961,15 @@ router.post('/add_product', function (req, res, next) {
         });
       }
     });
+  }
+  });
 });
 
 
+
+
 // Inventory Update
-router.get('/inventory-update',  ensureAuthenticated, function (req, res, next) {
+router.get('/inventory-update',   function (req, res, next) {
   
   db.query("select * from Products where clientid = ? and active_ind = 1; select * from Supplier where clientid = ?; ", [req.user.clientid, req.user.clientid ], function (err, rs) {
     if (err) {
@@ -152,7 +1014,8 @@ router.post('/inventory-update', function (req, res, next) {
 
 // sales
 router.get('/sales',  ensureAuthenticated, function (req, res, next) {
-  var sql = "select * from Products where clientid = ? and active_ind = 1; select * from Customer where clientid = ?;"
+  const prodss = [];
+  var sql = "select * from Products where clientid = ? and active_ind = 1; select * from Customer where clientid = ?; "
   db.query(sql, [req.user.clientid, req.user.clientid], function (err, rs) {
     if (err) {
       res.send(err);
@@ -164,19 +1027,22 @@ router.get('/sales',  ensureAuthenticated, function (req, res, next) {
 });
 
 router.post('/sales', function (req, res, next) {
-  const { date, pname, cat, price, quant, cust, description } = req.body;
+  const { date, pname, cat, price, quant, cust, description, sname } = req.body;
   var cid  = 0
+  console.log(pname);
+ 
     db.query("select prod_id from Products where prod_name = ?; select cust_id from Customer where Name = ? ;", [pname, cust], function (err, rs) {
       if (err) {
         res.send(err);
       }
       else {
-        var pid = rs[0][0].prod_id;
+        console.log(rs[0][0].prod_id);
+        var pid = rs[0][0].prod_id; 
+        console.log(pid);
    
         if(cust) {
         cid = rs[1][0].cust_id;
         }
- 
         const tot_price = quant * price;
         const full_name = req.user.first_name + ' ' + req.user.last_name;
         db.query("insert into Sales(prod_id, cust_id, date , price, quantity, comments, clientid, add_by, total_price) values ('" + pid + "','" + cid + "','" + date + "', '" + price + "', '" + quant + "','" + description + "','" + req.user.clientid + "','" + full_name + "', '" + tot_price + "'); update Products set stockquantity = stockquantity - ? where prod_name = ? and clientid = ?",[quant, pname, req.user.clientid], function (err, rs) {
@@ -198,14 +1064,16 @@ router.post('/sales', function (req, res, next) {
 
 
 // supplier
-router.get('/supplier',  ensureAuthenticated, function (req, res, next) {
+router.get('/supplier',   function (req, res, next) {
   res.render('supplier');
 });
 
 router.post('/supplier', function (req, res, next) {
   const { name, pno, email, addy, city, state, country, description } = req.body;
-    const full_name = req.user.first_name + ' ' + req.user.last_name;
-    db.query("insert into Supplier(sup_name, phone_number , email, address, city, state, country, description, clientid, add_by) values ('" + name + "','" + pno + "', '" + email + "', '" + addy + "','" + city + "', '" + state + "','" + country + "', '" + description + "', '" + req.user.clientid + "',  '" + full_name + "')", function (err, rs) {
+    //const full_name = req.user.first_name + ' ' + req.user.last_name;
+    var names = name.replace(/\s+/g, ' ');
+    console.log(names);
+    db.query("insert into supplier(sup_name, phone , email, address, city, state, country, description) values ('" + names + "','" + pno + "', '" + email + "', '" + addy + "','" + city + "', '" + state + "','" + country + "', '" + description + "')", function (err, rs) {
       if (err) {
         console.log(err);
         req.flash('error', 'Error: Supplier not Inserted')
@@ -227,8 +1095,9 @@ router.get('/customer',  ensureAuthenticated, function (req, res, next) {
 
 router.post('/customer', function (req, res, next) {
   const { name, pno, email, addy, city, state, country } = req.body;
+  var names = name.replace(/\s+/g, ' ');
     const full_name = req.user.first_name + ' ' + req.user.last_name
-    db.query("insert into Customer(Name, phone_no, email, address, city, state, country, clientid, add_by) values ('" + name + "','" + pno + "', '" + email + "', '" + addy + "','" + city + "', '" + state + "','" + country + "','" + req.user.clientid+ "','" + full_name  + "')", function (err, rs) {
+    db.query("insert into Customer(Name, phone_no, email, address, city, state, country, clientid, add_by) values ('" + names + "','" + pno + "', '" + email + "', '" + addy + "','" + city + "', '" + state + "','" + country + "','" + req.user.clientid+ "','" + full_name  + "')", function (err, rs) {
       if (err) {
         console.log(err);
         req.flash('error', 'Error: Customer not Inserted')
@@ -241,11 +1110,7 @@ router.post('/customer', function (req, res, next) {
     });
 });
 
-
-
-
-
-
+/*
 // picture upload with multer
 //set storage
 const storage = multer.diskStorage({
@@ -281,24 +1146,25 @@ function checkFileType(file, cb) {
   }
 }
 
-
+*/
 
 
 
 
 //register page
 router.get('/register', function (req, res) {
-  res.render('register');
+  const states = ['Abia',	'Adamawa',	'Akwa Ibom',	'Anambra',	'Bauchi',	'Bayelsa',	'Benue',	'Borno',	'Cross River',	'Delta',	'Ebonyi',	'Edo',	'Ekiti',	'Enugu',	'Gombe',	'Imo',	'Jigawa',	'Kaduna',	'Kano',	'Katsina',	'Kebbi',	'Kogi',	'Kwara',	'Lagos',	'Nasarawa',	'Niger',	'Ogun',	'Ondo',	'Osun',	'Oyo',	'Plateau',	'Rivers',	'Sokoto',	'Taraba',	'Yobe',	'Zamfara',	'Abuja']
+  res.render('register', {state:states});
 });
 
 
 //register post
 router.post('/register', function (req, res) {
-  const { fname, lname,bname, city, state, country, email, password, pass2, size, website,  phone, busname } = req.body;
+  const { fname, lname, addy, city, state, country, email, password, pass2,  phone,  } = req.body;
   let errors = [];
 
 
-  if (!fname || !lname || !bname || !city || !busname || !state || !country ||!email || !phone || !password || !pass2) {
+  if (!fname || !lname || !city || !addy || !state || !country ||!email || !phone || !password || !pass2) {
     errors.push({ msg: 'Please fill in all required fields' });
   }
 
@@ -311,66 +1177,40 @@ router.post('/register', function (req, res) {
       errors,
       fname,
       lname,
-      bname,
       city,
       state,
       country,
       email,
       password,
       pass2,
-      busname,
-      size,
-      website,
+      addy,
       phone
     });
   }
   // validation passed
   else {
-    db.query("select COUNT(*) AS cnt from Client where domain = ?; select COUNT(*) AS cont from Client where email = ? ",
-      [bname, email], function (err, data) {
-        console.log(data[0][0].cnt);
-        console.log(data[1][0].cont);
+    db.query("select COUNT(*) AS cont from customer where email = ? ",
+      [email], function (err, data) {
+        console.log(data[0].cnt);
+    
 
         if (err) {
           res.send("there is an eeror");
         }
-        else {
-          if (data[0][0].cnt > 0 ) {
-            errors.push({ msg: 'Unique Name  is already Registered. Choose a new Unique Name' });
+        
+        if (data[0].cont > 0 ) {
+            errors.push({ msg: 'Email is already registered. Please register with new email' });
             res.render('register', {
               errors,
               fname,
               lname,
-              bname,
               city,
               state,
               country,
               email,
               password,
               pass2,
-              busname,
-              size,
-              website,
-              phone
-            });
-          }
-
-          else if (data[1][0].cont > 0 ) {
-            errors.push({ msg: 'Email is already Registered. Register with new Email' });
-            res.render('register', {
-              errors,
-              fname,
-              lname,
-              bname,
-              city,
-              state,
-              country,
-              email,
-              password,
-              pass2,
-              busname,
-              size,
-              website,
+              addy,
               phone
             });
           }
@@ -392,12 +1232,23 @@ router.post('/register', function (req, res) {
                   let password = hash;
                   const roles = 'Admin';
 
-                  db.query("insert into `Client`(firstname, lastname, CompanyName, city, state, country,  email, phoneno, password, companysize, website, domain,  token) values ('" + fname + "','" + lname + "',  '" + busname + "', '" + city + "', '" + state + "', '" + country + "', '" + email + "','" + phone + "','" + password + "', '" + size + "', '" + website + "', '" + bname + "','" + token + "') ; insert into `Users`(first_name, last_name, role_name, phone_number, email, clientid, password, token) values ('" + fname + "','" + lname + "', '" + roles + "', '" + phone + "', '" + email + "', '" + bname + "','" + password + "', '" + token + "') ", function (err, rs) {
+                  db.query("insert into `customer`(fname, lname, address, city, state, country,  email, phone, password,  token) values ('" + fname + "','" + lname + "',  '" + addy + "', '" + city + "', '" + state + "', '" + country + "', '" + email + "','" + phone + "','" + password + "','" + token + "') ;" , function (err, rs) {
                     if (err) {
+                      console.log(err);
                       req.flash('error', 'Account not Registered.Please try again')
                       res.redirect('/register');
                     }
                     else {
+
+                      db.query("INSERT INTO `address`(cust_id, address, city, state, country) SELECT id, address, city, state, country FROM customer where token = ?;" , [token], function (err, rs) {
+                        if (err) {
+                          console.log(err + 'Ficc');
+                          req.flash('error', 'Account not Registered.Please try again')
+                          res.redirect('/register');
+                        }
+                      });
+
+
                    
                       req.flash('success_msg', 'Your Account Successfully Created. Please Login.')
                       res.redirect('/login');
@@ -457,12 +1308,9 @@ router.post('/register', function (req, res) {
              
 
             ]
-
     );
-
-
           }
-        }
+        
       });
   }
 
@@ -522,7 +1370,7 @@ router.get('/login', function (req, res) {
 //login post
 router.post('/login', function (req, res, next) {
   passport.authenticate('local', {
-    successRedirect: '/dashboard',
+    successRedirect: '/myaccount',
     failureRedirect: '/login',
     failureFlash: true
     //session: false
@@ -533,7 +1381,7 @@ router.post('/login', function (req, res, next) {
 router.get('/logout', function (req, res, next) {
   req.logout();
   req.flash('success_msg', 'You are logged out');
-  res.redirect('/login');
+  res.redirect('/homeshop');
 });
 
 // forget password page
@@ -1830,7 +2678,67 @@ router.get('/netprofit',  ensureAuthenticated, function (req, res, next) {
     });
   });
   
+
+
+
+
+
+
+
+  // sales
+router.get('/saler',  ensureAuthenticated, function (req, res, next) {
+  const prodss = [];
+  var sql = "select * from Products where clientid = ? and active_ind = 1; select * from Customer where clientid = ?;"
+  db.query(sql, [req.user.clientid, req.user.clientid], function (err, rs) {
+    if (err) {
+      res.send(err);
+    }
+    else {
+      res.render('saler', { data: rs[0], datum: rs[1] });
+    }
+  });
+});
+
+router.post('/saler', function (req, res, next) {
+  const { date, pname, cat, price, quant, cust, description, sname } = req.body;
+  var cid  = 0
+  console.log(pname);
+
+  var myTableArray = req.body.myTableArray;
+  console.log(myTableArray);
+  console.log(req.body);
   
+ 
+    db.query("select prod_id from Products where prod_name = ?; select cust_id from Customer where Name = ? ;", [pname, cust], function (err, rs) {
+      if (err) {
+        res.send(err);
+      }
+      else {
+        console.log(rs[0][0].prod_id);
+        var pid = rs[0][0].prod_id; 
+        console.log(pid);
+   
+        if(cust) {
+        cid = rs[1][0].cust_id;
+        }
+ 
+        const tot_price = quant * price;
+        const full_name = req.user.first_name + ' ' + req.user.last_name;
+        db.query("insert into Sales(prod_id, cust_id, date , price, quantity, comments, clientid, add_by, total_price) values ('" + pid + "','" + cid + "','" + date + "', '" + price + "', '" + quant + "','" + description + "','" + req.user.clientid + "','" + full_name + "', '" + tot_price + "'); update Products set stockquantity = stockquantity - ? where prod_name = ? and clientid = ?",[quant, pname, req.user.clientid], function (err, rs) {
+          if (err) {
+            console.log(err);
+            req.flash('error', 'Error: Sale not Inserted')
+            res.redirect('/saler');
+          }
+          else {
+            req.flash('success_msg', 'Sale Successfully Added')
+            res.redirect('/saler');
+          }
+        });
+      }
+    });
+});
+
 
 
 

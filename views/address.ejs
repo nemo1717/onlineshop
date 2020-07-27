@@ -1,0 +1,30 @@
+<link rel="stylesheet" type="text/css" href="/css/styla.css" />
+
+<div class="s-layout">
+
+        
+        <!-- Content -->
+
+<main class="s-layout__content">     
+<div class="section-form">
+  <% include ./partials/messages %>
+                              
+  <% if ( success_messages !='' ) { %>
+    <div class="alert alert-success" >
+        <strong><%= success_messages %> </strong>
+    </div>
+    <% } %>
+
+        <form  action="/address" method="post">
+          <div class="intro"> 
+            <h1 style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; font-size: 18px;">Edit Mailing Address</h1>
+          </div>
+          <input type="text" value="" placeholder="Address " name="address" required/>
+          <input type="text" value="" placeholder="City" name="city" required/>
+          <input type="text" value="" placeholder="State " name="state" required/>
+          <input type="text" value="" placeholder="Country " name="country" required/>
+          <button style="background-color: green;" type="submit" class="btn btn-primary btn-block">Continue to Checkout</button>
+        </form>
+      </div>
+        </main>
+        </div>

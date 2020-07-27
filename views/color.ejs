@@ -1,0 +1,27 @@
+<link rel="stylesheet" type="text/css" href="/css/styla.css" />
+
+<div class="s-layout">
+
+        
+        <!-- Content -->
+
+<main class="s-layout__content">     
+<div class="section-form">
+
+                              
+  <% if ( success_messages !='' ) { %>
+    <div class="alert alert-success" >
+        <strong><%= success_messages %> </strong>
+    </div>
+    <% } %>
+
+        <form  action="/color" method="post">
+          <div class="intro"> 
+            <h1 style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; font-size: 18px;">Add Color</h1>
+          </div>
+          <input type="text" value="" placeholder="Color " name="color" required/>
+          <button type="submit" style="background-color: green;"  class="btn btn-primary btn-block" >Submit</button>
+        </form>
+      </div>
+        </main>
+        </div>

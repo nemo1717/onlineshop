@@ -7,7 +7,9 @@ var passport = require('passport');
 var expressLayouts = require('express-ejs-layouts');
 var flash = require('connect-flash');
 var session = require('express-session');
+var bodyParser = require('body-parser')
 //var LocalStrategy = require('passport-local').Strategy;
+
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -70,6 +72,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+app.use( bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
