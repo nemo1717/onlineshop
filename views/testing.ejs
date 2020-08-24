@@ -1,0 +1,118 @@
+<!doctype html>
+
+<head>
+<meta charset="utf-8">
+<title></title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width">
+
+<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+
+<link rel="stylesheet" href="styles/main.css">
+<style>
+    .col-1, .col-2, .col-3 {
+        width: 32.98%;
+        float:left;
+    }
+
+</style>
+
+</head>
+<body>
+<div class="container">
+<header class="header">
+
+</header>
+<div class="row">
+    <div class="col-1">
+        <div class="header"><img src="images/sub1.jpg" width="177" height="61" longdesc="main.php" /></div>
+    </div> <!-- End of COLUMN 1 --> 
+
+    <div class="col-2"> <!-- Start of COLUMN 2 -->
+
+        <div class="header"><img src="images/sub1.jpg" width="177" height="61" longdesc="main.php" />
+            <table width="300" border="0" align="center" cellpadding="0" cellspacing="1" bgcolor="">
+                <tr>
+                    <form name="form1" method="post" action="checklogin.php">
+                        <td>
+                            <table width="100%" border="0" cellpadding="3" cellspacing="1" bgcolor="">
+                                <tr>
+                                    <td colspan="3"><strong>Member Login </strong></td>
+                                </tr>
+                                <tr>
+                                    <td width="78">Username</td>
+                                    <td width="6">:</td>
+                                    <td width="294"><input name="myusername" type="text" id="myusername"></td>
+                                </tr>
+                                <tr>
+                                    <td>Password</td>
+                                    <td>:</td>
+                                    <td><input name="mypassword" type="password" id="mypassword"></td>
+                                </tr>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                    <td><input type="submit" name="Submit" value="Login"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </form>
+                </tr>
+            </table>
+
+            <table width="300" border="0" align="center" cellpadding="0" cellspacing="1" bgcolor="">
+                <tr>
+                    <form name="form2" method="post" action="signup.php">
+                        <td>
+                            <table width="100%" border="0" cellpadding="3" cellspacing="1" bgcolor="">
+                                <tr>
+                                    <td colspan="3"><p>&nbsp;</p>
+                                        <p><strong> Sign Up Here</strong></p></td>
+                                </tr>
+                                <tr>
+                                    <td width="78">Username</td>
+                                    <td width="6">:</td>
+                                    <td width="294"><input name="myusername" type="text" id="myusername" value = "<? echo $_SESSION['usertmp'] ?>"></td>
+                                </tr>
+                                <tr>
+                                    <td>Enter Password</td>
+                                    <td>:</td>
+                                    <td><input name="mypassword" type="password" id="mypassword"></td>
+                                </tr>
+                                <tr>
+                                    <td>Confirm Password</td>
+                                    <td>:</td>
+                                    <td><input name="mypassword2" type="password" id="mypassword2"></td>
+                                </tr>
+                                <tr>
+                                    <td>Email id</td>
+                                    <td>:</td>
+                                    <td><input name="myemail" type="text" id="myemail" value = "<? echo $_SESSION['emailtmp'] ?>"></td>
+                                </tr>
+
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                    <td><input type="submit" name="Submit" value="Sign Up"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </form>
+                </tr>
+            </table>
+    </div>  <!-- End of COLUMN 2 --> 
+    <div class="col-3"> <!-- COLUMN 3 --> 
+        <!-- You can leave this empty if you want -->
+    </div>
+    <div class="row">
+        <div class="footer">
+
+        </div>
+
+    </div>
+</div>
+</div>
+
+
+</body>
+</html>

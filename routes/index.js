@@ -16,6 +16,7 @@ var bodyParser = require('body-parser');
 const multerStorage = multer.memoryStorage();
 var request = require('request');
 var unirest = require("unirest");
+const { promisify } = require('util');
 
 
 
@@ -54,6 +55,35 @@ router.get('/', function (req, res, next) {
   res.redirect('/homepage');
 });
 
+
+// testing
+router.get('/testing', function (req, res, next) {
+  var results = [ { 
+    asin: 'B01571L1Z4',
+    url: 'domain.com',
+    favourite: false,
+    createdAt: '2016-11-18T19:08:41.662Z',
+    updatedAt: '2016-11-18T19:08:41.662Z',
+    id: '582f51b94581a7f21a884f40' 
+  },
+  { 
+    asin: 'B01IM0K0R2',
+    url: 'domain2.com',
+    favourite: false,
+    createdAt: '2016-11-16T17:56:21.696Z',
+    updatedAt: '2016-11-16T17:56:21.696Z',
+    id: 'B01IM0K0R2' 
+   }];
+
+var content = results.reduce(function(a, b) {
+  return a + '<tr><td>' + b.asin + '</a></td><td>' + b.url + '</td><td>' + b.favourite + '</td><td>' + b.reatedAt + '</td></tr>';
+}, '');
+
+console.log(content);
+res.render('testing')
+});
+
+
 router.get('/sucess', function (req, res, next) {
   var stockid = [];
   var cartid = [];
@@ -72,20 +102,15 @@ router.get('/sucess', function (req, res, next) {
       request(options, function (error, response) { 
         if (error) throw new Error(error);
         var datas  = response.body;
-        console.log(response.body);
+       
         
         //var customer  = response.card;
         var daty = JSON.parse(datas);
        //var cust = JSON.parse(customer);
         //console.log(daty)
-      
-   
         var cust_id = daty.data[0].meta.consumer_id;
        // var addy = daty.data[0].meta.consumer_mac;
-       
-       
         //console.log(daty.data[0].amount);
-    
         done(error, cust_id);
       });
     },
@@ -94,10 +119,9 @@ router.get('/sucess', function (req, res, next) {
       crypto.randomBytes(10, function (err, buf) {
         var order_id = buf.toString('hex');
   
-
-  
       //var stockid = [];
       cust_id = parseInt(cust_id);
+      console.log('jabulani id' + cust_id);
       order_id = order_id.toString();
 
       db.query("select address.addy_id, address.address, address.city, address.state, address.country from customer join address on customer.id = address.cust_id where address.cust_id = ? order by address.addy_id desc limit 1; " , [cust_id], function (err, rss) {
@@ -105,7 +129,8 @@ router.get('/sucess', function (req, res, next) {
           console.log(err);
         }
         else {
-          var addy_id = rss[0].addy_id
+          var addy_id = rss[0].addy_id;
+          console.log('ja id  ' + cust_id);
         db.query("Insert into `order`(order_id, cust_id, addy_id) values ('" + order_id + "','" + cust_id + "', '" + addy_id + "');" , function (err, rs) {
           if (err) {
             console.log(err);
@@ -120,37 +145,806 @@ router.get('/sucess', function (req, res, next) {
                   stockid.push(data.stock_id)
                   cartid.push(data.cart_id);
                 });
-                for(i = 0; i < stockid.length; i++){
-                  db.query("insert into order_detail( order_id, stock_id) values ('" + order_id + "','" + stockid[i] + "') ;",  function (err, rs) {
+
+                let lengths = stockid.length;
+                var j = 0;
+
+                let results;
+                const query = promisify(db.query.bind(db));
+                Promise.all(stockid.map(id => query("insert into order_detail( order_id, stock_id) values ('" + order_id + "','" + id + "') ;")))
+                .then(() => query('select *, order_detail.order_id as orderid from sodiq_business.order_detail join sodiq_business.order on sodiq_business.order.order_id = sodiq_business.order_detail.order_id join sodiq_business.stock on sodiq_business.stock.stock_id = sodiq_business.order_detail.stock_id join sodiq_business.customer on sodiq_business.customer.id = sodiq_business.stock.seller_id join sodiq_business.product on sodiq_business.product.prod_id = sodiq_business.stock.prod_id where order_detail.order_id = ?', [order_id]))
+                .then(data => {
+                  var email = req.user.email;
+                //  console.log(email);
+                   console.log('I am here bitches' + data);
+                  var content = `
+                  <!-- THIS EMAIL WAS BUILT AND TESTED WITH LITMUS http://litmus.com -->
+<!-- IT WAS RELEASED UNDER THE MIT LICENSE https://opensource.org/licenses/MIT -->
+<!-- QUESTIONS? TWEET US @LITMUSAPP -->
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<style type="text/css">
+/* CLIENT-SPECIFIC STYLES */
+body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+img { -ms-interpolation-mode: bicubic; }
+
+/* RESET STYLES */
+img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+table { border-collapse: collapse !important; }
+body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+
+/* iOS BLUE LINKS */
+a[x-apple-data-detectors] {
+    color: inherit !important;
+    text-decoration: none !important;
+    font-size: inherit !important;
+    font-family: inherit !important;
+    font-weight: inherit !important;
+    line-height: inherit !important;
+}
+
+/* MEDIA QUERIES */
+@media screen and (max-width: 480px) {
+    .mobile-hide {
+        display: none !important;
+    }
+    .mobile-center {
+        text-align: center !important;
+    }
+}
+
+/* ANDROID CENTER FIX */
+div[style*="margin: 16px 0;"] { margin: 0 !important; }
+</style>
+</head>
+<body style="margin: 0 !important; padding: 0 !important; background-color: #eeeeee;" bgcolor="#eeeeee">
+
+<!-- HIDDEN PREHEADER TEXT -->
+<div style="display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: Open Sans, Helvetica, Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;">
+Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus dolor aliquid omnis consequatur est deserunt, odio neque blanditiis aspernatur, mollitia ipsa distinctio, culpa fuga obcaecati!
+</div>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+        <td align="center" style="background-color: #eeeeee;" bgcolor="#eeeeee">
+        <!--[if (gte mso 9)|(IE)]>
+        <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+        <tr>
+        <td align="center" valign="top" width="600">
+        <![endif]-->
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;">
+            <tr>
+                <td align="center" valign="top" style="font-size:0; padding: 35px;" bgcolor="#044767">
+                <!--[if (gte mso 9)|(IE)]>
+                <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+                <tr>
+                <td align="left" valign="top" width="300">
+                <![endif]-->
+                <div style="display:inline-block; max-width:50%; min-width:100px; vertical-align:top; width:100%;">
+                    <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
+                        <tr>
+                            <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 36px; font-weight: 800; line-height: 48px;" class="mobile-center">
+                                <h1 style="font-size: 36px; font-weight: 800; margin: 0; color: #ffffff;">Beretun</h1>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <!--[if (gte mso 9)|(IE)]>
+                </td>
+                <td align="right" width="300">
+                <![endif]-->
+                <div style="display:inline-block; max-width:50%; min-width:100px; vertical-align:top; width:100%;" class="mobile-hide">
+                    <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
+                        <tr>
+                            <td align="right" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; line-height: 48px;">
+                                <table cellspacing="0" cellpadding="0" border="0" align="right">
+                                    <tr>
+                                        <td style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400;">
+                                            <p style="font-size: 18px; font-weight: 400; margin: 0; color: #ffffff;"><a href="http://litmus.com" target="_blank" style="color: #ffffff; text-decoration: none;">Shop &nbsp;</a></p>
+                                        </td>
+                                        <td style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 24px;">
+                                            <a href="http://litmus.com" target="_blank" style="color: #ffffff; text-decoration: none;"><img src="shop.png" width="27" height="23" style="display: block; border: 0px;"/></a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <!--[if (gte mso 9)|(IE)]>
+                </td>
+                </tr>
+                </table>
+                <![endif]-->
+                </td>
+            </tr>
+            <tr>
+                <td align="center" style="padding: 35px 35px 20px 35px; background-color: #ffffff;" bgcolor="#ffffff">
+                <!--[if (gte mso 9)|(IE)]>
+                <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+                <tr>
+                <td align="center" valign="top" width="600">
+                <![endif]-->
+                <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;">
+                    <tr>
+                        <td align="center" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding-top: 25px;">
+                            <img src="hero-image-receipt.png" width="125" height="120" style="display: block; border: 0px;" /><br>
+                            <h2 style="font-size: 30px; font-weight: 800; line-height: 36px; color: #333333; margin: 0;">
+                                Thank You For Your Order!
+                            </h2>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding-top: 10px;">
+                            <p style="font-size: 16px; font-weight: 400; line-height: 24px; color: #777777;">
+                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Praesentium iste ipsa numquam odio dolores, nam.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" style="padding-top: 20px;">
+                            <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                                <tr>
+                                    <td width="75%" align="left" bgcolor="#eeeeee" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px;">
+                                        Order Confirmation #
+                                    </td>
+                                    <td width="25%" align="left" bgcolor="#eeeeee" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px;">
+                                        ${order_id}
+                                    </td>
+                                </tr>
+                  ` 
+                  
+                  + data.reduce(function(a, b) {
+                    return a + `
+                    <tr>
+                    <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">
+                        ${b.prod_name}
+                    </td>
+                    <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">
+                        ${b.price}
+                    </td>
+
+               
+                    `
+                  }, '')
+
+                  +
+                  `
+                  <tr>
+                  <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;">
+                      Sales Tax
+                  </td>
+                  <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;">
+                      $5.00
+                  </td>
+              </tr>
+          </table>
+      </td>
+  </tr>
+  <tr>
+      <td align="left" style="padding-top: 20px;">
+          <table cellspacing="0" cellpadding="0" border="0" width="100%">
+              <tr>
+                  <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
+                      TOTAL
+                  </td>
+                  <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
+                      $115.00
+                  </td>
+              </tr>
+          </table>
+      </td>
+  </tr>
+</table>
+<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->
+</td>
+</tr>
+<tr>
+<td align="center" height="100%" valign="top" width="100%" style="padding: 0 35px 35px 35px; background-color: #ffffff;" bgcolor="#ffffff">
+<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+<tr>
+<td align="center" valign="top" width="600">
+<![endif]-->
+<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:660px;">
+  <tr>
+      <td align="center" valign="top" style="font-size:0;">
+          <!--[if (gte mso 9)|(IE)]>
+          <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+          <tr>
+          <td align="left" valign="top" width="300">
+          <![endif]-->
+          <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
+
+              <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
+                  <tr>
+                      <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
+                          <p style="font-weight: 800;">Delivery Address</p>
+                          <p>675 Massachusetts Avenue<br>11th Floor<br>Cambridge, MA 02139</p>
+
+                      </td>
+                  </tr>
+              </table>
+          </div>
+          <!--[if (gte mso 9)|(IE)]>
+          </td>
+          <td align="left" valign="top" width="300">
+          <![endif]-->
+          <div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
+              <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
+                  <tr>
+                      <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
+                          <p style="font-weight: 800;">Estimated Delivery Date</p>
+                          <p>January 1st, 2016</p>
+                      </td>
+                  </tr>
+              </table>
+          </div>
+          <!--[if (gte mso 9)|(IE)]>
+          </td>
+          </tr>
+          </table>
+          <![endif]-->
+      </td>
+  </tr>
+</table>
+<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->
+</td>
+</tr>
+<tr>
+<td align="center" style=" padding: 35px; background-color: #1b9ba3;" bgcolor="#1b9ba3">
+<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+<tr>
+<td align="center" valign="top" width="600">
+<![endif]-->
+<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;">
+  <tr>
+      <td align="center" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding-top: 25px;">
+          <h2 style="font-size: 24px; font-weight: 800; line-height: 30px; color: #ffffff; margin: 0;">
+              Get 25% off your next order.
+          </h2>
+      </td>
+  </tr>
+  <tr>
+      <td align="center" style="padding: 25px 0 15px 0;">
+          <table border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                  <td align="center" style="border-radius: 5px;" bgcolor="#66b3b7">
+                    <a href="http://litmus.com" target="_blank" style="font-size: 18px; font-family: Open Sans, Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 5px; background-color: #66b3b7; padding: 15px 30px; border: 1px solid #66b3b7; display: block;">Awesome</a>
+                  </td>
+              </tr>
+          </table>
+      </td>
+  </tr>
+</table>
+<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->
+</td>
+</tr>
+<tr>
+<td align="center" style="padding: 35px; background-color: #ffffff;" bgcolor="#ffffff">
+<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+<tr>
+<td align="center" valign="top" width="600">
+<![endif]-->
+<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;">
+  <tr>
+      <td align="center">
+          <img src="logo-footer.png" width="37" height="37" style="display: block; border: 0px;"/>
+      </td>
+  </tr>
+  <tr>
+      <td align="center" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 24px; padding: 5px 0 10px 0;">
+          <p style="font-size: 14px; font-weight: 800; line-height: 18px; color: #333333;">
+              675 Massachusetts Avenue<br>
+              Cambridge, MA 02139
+          </p>
+      </td>
+  </tr>
+  <tr>
+      <td align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 24px;">
+          <p style="font-size: 14px; font-weight: 400; line-height: 20px; color: #777777;">
+              If you didn't create an account using this email address, please ignore this email or <a href="http://litmus.com" target="_blank" style="color: #777777;">unsusbscribe</a>.
+          </p>
+      </td>
+  </tr>
+</table>
+<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->
+</td>
+</tr>
+</table>
+<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->
+</td>
+</tr>
+</table>
+<!-- LITMUS ATTRIBUTION -->
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr>
+<td bgcolor="#ffffff" align="center">
+<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+<tr>
+<td align="center" valign="top" width="600">
+<![endif]-->
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;" >
+  <tr>
+      <td bgcolor="#ffffff" align="center" style="padding: 30px 30px 30px 30px; color: #666666; font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 18px;" >
+          <p style="margin: 0;">This email was built and tested with Litmus. <a href="https://litmus.com?utm_campaign=litmus_templates&utm_source=litmus_community&utm_medium=templates" style="color: #5db3ec;">What's Litmus?</a></p>
+      </td>
+  </tr>
+</table>
+<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->
+</td>
+</tr>
+</table>
+<!-- END LITMUS ATTRIBUTION -->
+</body>
+</html>
+
+                  `
+                
+
+                  var smtpTransport = nodemailer.createTransport({
+                    service: 'Gmail',
+                    secure: false,
+                    auth: {
+                      user: 'tunjimikel@gmail.com',
+                      pass: 'Layanhova@17'
+                    },
+                    tls: {
+                      rejectUnauthorized: false
+                    }
+                
+                  });
+                
+                  
+                  var mailOptions = {
+                 
+                    to: email,
+                    from: 'tunjimikel@gmail.com',
+                    subject: 'Thanks For Your Purchase',
+                   // text: 'Thanks for your purchase' ,
+                    html: content
+                
+                  };
+                
+                
+                
+                  smtpTransport.sendMail(mailOptions, function (err) {
+                    console.log('mail sent');
+                
                     if (err) {
                       console.log(err);
                     }
+                    else{
+                      Console.log('email has been sent');
+                    }
                   });
-                }
 
-                for(i = 0; i < cartid.length; i++){
-                  console.log(cartid);
-                      db.query("DELETE FROM cart where cart_id = ?;", [cartid[i]],  function (err, rs) {
+                  console.log(data);
+                  var seller_email = [];
+                  data.map(datas => {
+                    seller_email.push(datas.email);
+                  });
+                  console.log(seller_email);
+
+                  var unique_seller_email =  seller_email.filter(function(item, pos) {
+                    return seller_email.indexOf(item) == pos;
+                });
+                console.log(unique_seller_email);
+                var email_string = unique_seller_email.join();
+                console.log(email_string);
+
+                var email_to_send = `
+                <!DOCTYPE html>
+<!-- Set the language of your main document. This helps screenreaders use the proper language profile, pronunciation, and accent. -->
+<html lang="en">
+  <head>
+    <!-- The title is useful for screenreaders reading a document. Use your sender name or subject line. -->
+    <title>An Accessible Account Update Email</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- Never disable zoom behavior! Fine to set the initial width and scale, but allow users to set their own zoom preferences. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <style type="text/css">
+        /* CLIENT-SPECIFIC STYLES */
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; }
+
+        /* RESET STYLES */
+        img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        table { border-collapse: collapse !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+
+        /* iOS BLUE LINKS */
+        a[x-apple-data-detectors] {
+            color: inherit !important;
+            text-decoration: none !important;
+            font-size: inherit !important;
+            font-family: inherit !important;
+            font-weight: inherit !important;
+            line-height: inherit !important;
+        }
+
+        /* GMAIL BLUE LINKS */
+        u + #body a {
+            color: inherit;
+            text-decoration: none;
+            font-size: inherit;
+            font-family: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+        }
+
+        /* SAMSUNG MAIL BLUE LINKS */
+        #MessageViewBody a {
+            color: inherit;
+            text-decoration: none;
+            font-size: inherit;
+            font-family: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+        }
+
+        /* These rules set the link and hover states, making it clear that links are, in fact, links. */
+        /* Embrace established conventions like underlines on links to keep emails accessible. */
+        a { color: #B200FD; font-weight: 600; text-decoration: underline; }
+        a:hover { color: #000000 !important; text-decoration: none !important; }
+
+        /* These rules adjust styles for desktop devices, keeping the email responsive for users. */
+        /* Some email clients don't properly apply media query-based styles, which is why we go mobile-first. */
+        @media screen and (min-width:600px) {
+            h1 { font-size: 48px !important; line-height: 48px !important; }
+            .intro { font-size: 24px !important; line-height: 36px !important; }
+        }
+    </style>
+  </head>
+  <body style="margin: 0 !important; padding: 0 !important;">
+
+    <!-- Some preview text. -->
+    <div style="display: none; max-height: 0; overflow: hidden;">
+            
+    </div>
+    <!-- Get rid of unwanted preview text. -->
+    <div style="display: none; max-height: 0px; overflow: hidden;">
+    &nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;
+    </div>
+
+    <!-- This ghost table is used to constrain the width in Outlook. The role attribute is set to presentation to prevent it from being read by screenreaders. -->
+    <!--[if (gte mso 9)|(IE)]>
+    <table cellspacing="0" cellpadding="0" border="0" width="600" align="center" role="presentation"><tr><td>
+    <![endif]-->
+    <!-- The role and aria-label attributes are added to wrap the email content as an article for screen readers. Some of them will read out the aria-label as the title of the document, so use something like "An email from Your Brand Name" to make it recognizable. -->
+    <!-- Default styling of text is applied to the wrapper div. Be sure to use text that is large enough and has a high contrast with the background color for people with visual impairments. -->
+    <div role="article" aria-label="An email from Your Brand Name" lang="en" style="background-color: white; color: #2b2b2b; font-family: 'Avenir Next', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; font-size: 18px; font-weight: 400; line-height: 28px; margin: 0 auto; max-width: 600px; padding: 40px 20px 40px 20px;">
+        
+        <!-- Logo section and header. Headers are useful landmark elements. -->
+        <header>
+            <!-- Since this is a purely decorative image, we can leave the alternative text blank. -->
+            <!-- Linking images also helps with Gmail displaying download links next to them. -->
+            <a href="https://litmus.com/community">
+                <center><img src="logo@2x.png" alt="" height="80" width="80"></center>
+            </a>
+            <!-- The h1 is the main heading of the document and should come first. -->
+            <!-- We can override the default styles inline. -->
+            <h1 style="color: #000000; font-size: 26px; font-weight: 800; line-height: 32px; margin: 48px 0; text-align: center;">
+                Congratulation New Purchase Made.
+            </h1>
+        </header>
+
+        <!-- Main content section. Main is a useful landmark element. -->
+        <main>
+            <!-- This div is purely presentational, providing a container for the message. -->
+            <div style="background-color: ghostwhite; border-radius: 4px; padding: 24px 48px;">
+                <!-- This ghost table is used solely for padding in Word-based Outlook clients. -->
+                <!--[if (gte mso 9)|(IE)]>
+                <table cellspacing="0" cellpadding="0" border="0" width="600" align="center" role="presentation"><tr><td style="background-color: ghostwhite;font-family: 'Avenir Next', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; padding: 24px 48px 24px 48px;">
+                <![endif]-->
+
+                <!-- Body copy -->
+                <p>
+                    New Purchased has been made. Please check your sellling list and prepare to ship the product to the customer.
+                </p>
+        
+                <!-- This link uses descriptive text to inform the user what will happen with the link is tapped. -->
+                <!-- It also uses inline styles since some email clients won't render embedded styles from the head. -->
+                <a href="https://litmus.com/community" style="color: #B200FD; text-decoration: underline;">Login your account now</a>
+
+                <p>
+                    If you think this email was sent in error, please ignore it. Thank you!  
+                </p>
+                <!--[if (gte mso 9)|(IE)]>
+                </td></tr></table>
+                <![endif]-->
+            </div>
+        </main>
+
+        <!-- Footer information. Footer is a useful landmark element. -->
+        <footer>
+            <!-- Since this is a transactional email, you aren't required to include opt-out language. -->
+            <p style="font-size: 16px; font-weight: 400; line-height: 24px; margin-top: 48px;">
+                Company Name
+            </p>
+  
+        </footer>
+
+    </div>
+    <!--[if (gte mso 9)|(IE)]>
+    </td></tr></table>
+    <![endif]-->
+  </body>
+</html>   
+                `
+
+                var smtpTransport = nodemailer.createTransport({
+                  service: 'Gmail',
+                  secure: false,
+                  auth: {
+                    user: 'tunjimikel@gmail.com',
+                    pass: 'Layanhova@17'
+                  },
+                  tls: {
+                    rejectUnauthorized: false
+                  }
+              
+                });
+              
+                
+                var mailOptions = {
+               
+                  to: email_string,
+                  from: 'tunjimikel@gmail.com',
+                  subject: 'New Purchase Made',
+                 // text: 'Thanks for your purchase' ,
+                  html: email_to_send
+              
+                };
+              
+              
+              
+                smtpTransport.sendMail(mailOptions, function (err) {
+                  console.log('mail sent');
+              
+                  if (err) {
+                    console.log(err);
+                  }
+                  else{
+                    Console.log('email has been sent');
+                  }
+                });
+
+
+
+
+                /*
+
+                  let result;
+                  result = data.reduce(function (r, a) {
+                    r[a.seller_id] = r[a.seller_id] || [];
+                    r[a.seller_id].push(a);
+                    return r;
+                  }, Object.create(null));
+
+                  console.log(result);
+                  
+                  var product_name = '';
+                  var price = '';
+                  var seller_email = '';
+                for (const [key, value] of Object.entries( result)) {
+                  for(var i = 0; i < Object.keys( result).length; i++) {
+                  //console.log(`${value[i].year}`)
+                  console.log(Object.keys(result)[i])
+                  if(Object.keys(result)[i] == `${key}`){
+                    var vals = `${key}`
+                    console.log(result[vals].length)
+                    for(var j = 0; j < result[vals].length; j++){
+
+  
+                    console.log(`${key}: ${value[j].cust_type}`);
+                    product_name = `${value[j].prod_name}`;
+                    price = `${value[j].price}`;
+                    seller_email = `${value[j].email}`;
+
+                  
+                 // console.log(`${key}`);
+                 // console.log(`${key}: ${value}`);
+              
+                  //}
+                    }
+                    }
+                  }
+                  console.log(product_name);
+                  console.log(price);
+                  console.log(seller_email);
+                  console.log('done');
+                }
+                */
+                  
+                });
+
+                
+
+                // Delete cart sold
+                   db.query("DELETE FROM cart where user_id = ?;", [req.user.id],  function (err, rs) {
                         if (err) {
                           console.log(err)
                         }
-                        else{
                           console.log('deleted');
-                        }
-                      });
-                }
-                
+                        
+                  });
               }
             });
           }
         });
       }
       });
+
+      // send email 
+      //req.flash('orderid', order_id)
+  //    res.redirect('/receipt');
     });
+
     }
   ]);
-  res.redirect('/cart');
+res.redirect('/cart');
 });
+
+
+// receipt email
+router.get('/receipt', function (req, res, next) {
+  let orderid = req.flash('orderid');
+  order_id =  '005b952fe763243aee73';
+  console.log('hhhhhh   ' + orderid)
+  console.log( orderid)
+  console.log( order_id);
+  db.query('select *, order_detail.order_id as orderid from  sodiq_business.order_detail  join sodiq_business.order  on sodiq_business.order.order_id = sodiq_business.order_detail.order_id join sodiq_business.stock on sodiq_business.stock.stock_id = sodiq_business.order_detail.stock_id join sodiq_business.customer on sodiq_business.customer.id = sodiq_business.stock.seller_id join sodiq_business.product on sodiq_business.product.prod_id = sodiq_business.stock.prod_id where order_detail.order_id = ?',[order_id],  function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+
+    else {
+      
+      var email = req.user.email
+      console.log(email);
+      console.log('space bitch');
+      var outputs = `
+      <h1>Contact details</h1>
+        <h2> name:${req.body.name} </h2><br>
+        <h2> email:${req.body.email} </h2><br>
+        <h2> phonenumber:${req.body.phonenumber} </h2><br>
+        <h2> message:${req.body.message} </h2><br>
+      `;
+
+      console.log(rs);
+      var content = rs.reduce(function(a, b) {
+        return a + `
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;">
+                   
+        <tr>
+            <td align="left" style="padding-top: 20px;">
+                <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                    <tr>
+                        <td width="75%" align="left" bgcolor="#eeeeee" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 15px; font-weight: 800; line-height: 24px; padding: 10px;">
+                            Order ID #
+                        </td>
+                        <td width="25%" align="left" bgcolor="#eeeeee" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 15px; font-weight: 800; line-height: 24px; padding: 10px;">
+                            ${order_id}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 15px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">
+                            ${b.prod_name}
+                        </td>
+                        <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 15px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">
+                            ${b.price}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;">
+                            Shipping + Handling
+                        </td>
+                        <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;">
+                            $10.00
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;">
+                            Sales Tax
+                        </td>
+                        <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 5px 10px;">
+                            $5.00
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td align="left" style="padding-top: 20px;">
+                <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                    <tr>
+                        <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
+                            TOTAL
+                        </td>
+                        <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px; border-top: 3px solid #eeeeee; border-bottom: 3px solid #eeeeee;">
+                            $115.00
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+        `;
+      }, '');
+
+  var smtpTransport = nodemailer.createTransport({
+    service: 'Gmail',
+    secure: false,
+    auth: {
+        user: 'tunjimikel@gmail.com',
+        pass: 'Layanhova@17'
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+
+  });
+
+  var mailOptions = {
+    to: email,
+    from: 'tunjimikel@gmail.com',
+    subject: 'Thanks For Your Purchase',
+   // text: 'Thanks for your purchase' ,
+    html: content
+
+  };
+
+  smtpTransport.sendMail(mailOptions, function (err) {
+    console.log('mail sent');
+
+    if (err) {
+      console.log(err);
+    }
+    else{
+      Console.log('email has been sent bitch');
+    }
+  });
+}
+});
+  res.render('receipt');
+});
+
 
 // test 
 router.get('/navy', function (req, res, next) {
@@ -228,22 +1022,513 @@ router.post('/address', function (req, res, next) {
 
 
 
-// profile
-router.get('/profile', function (req, res, next) {
+// buyer profile
+router.get('/profile', ensureAuthenticated, function (req, res, next) {
   db.query("SELECT * FROM sodiq_business.customer where id = ?;  SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3;", [req.user.id], function (err, rs) {
     if (err) {
       console.log(err);
     }
     else {
-
       var fname = req.user.fname;
       var lname= req.user.lname;
-
-
-      res.render('profile', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3], lname:lname, fname:fname})
+      var customer = req.user.cust_type;
+      var stat = rs[0][0].cust_type;
+      var status = stat.toString();
+      res.render('profile', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3], lname:lname, fname:fname, status:status, customer:customer})
     }
   });
 });
+
+
+
+// purchase history
+
+// shipped
+router.get('/purchase-history', function (req, res, next) {
+  db.query("SELECT * FROM sodiq_business.`order` join sodiq_business.order_detail on sodiq_business.order.order_id = sodiq_business.order_detail.order_id join sodiq_business.stock on sodiq_business.stock.stock_id = sodiq_business.order_detail.stock_id join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id where shipping_status = 'unshipped' and `order`.cust_id = ? ; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3; SELECT * FROM sodiq_business.order_detail join sodiq_business.stock on sodiq_business.stock.stock_id = sodiq_business.order_detail.stock_id join sodiq_business.product on sodiq_business.product.prod_id = sodiq_business.stock.prod_id where sodiq_business.stock.seller_id = ?", [req.user.id, req.user.id], function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      var fname = req.user.fname;
+      var lname= req.user.lname;
+      var customer = req.user.cust_type;
+      
+      res.render('purchase-history', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3], seller:rs[4], customer:customer, lname:lname, fname:fname, moment:moment})
+    }
+  });
+});
+
+
+// shipped
+router.get('/profile/:token', function (req, res, next) {
+  var token = req.params.token;
+  db.query("SELECT * FROM sodiq_business.`order` join sodiq_business.order_detail on sodiq_business.order.order_id = sodiq_business.order_detail.order_id join sodiq_business.stock on sodiq_business.stock.stock_id = sodiq_business.order_detail.stock_id join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id where shipping_status = ? and `order`.cust_id = ? ;  SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3; SELECT * FROM sodiq_business.order_detail join sodiq_business.stock on sodiq_business.stock.stock_id = sodiq_business.order_detail.stock_id join sodiq_business.product on sodiq_business.product.prod_id = sodiq_business.stock.prod_id where sodiq_business.stock.seller_id = ? and shipping_status = ?", [token,req.user.id,req.user.id, token], function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      var fname = req.user.fname;
+      var lname= req.user.lname;
+      var customer = req.user.cust_type;
+      res.render('purchase-history', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3], seller:rs[4], lname:lname, customer:customer, fname:fname, moment:moment})
+    }
+  });
+});
+
+// add traking number 
+/*
+router.get('/tracking-number', function (req, res, next) {
+  res.render('tracking-number');
+});
+*/
+
+
+router.get('/tracking-number/:token', function (req, res, next) {
+  var token = req.params.token;
+  var sdate = new Date();
+  console.log(token);
+  db.query(" SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3; ", function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      var fname = req.user.fname;
+      var lname= req.user.lname;
+      var customer = req.user.cust_type;
+      
+      res.render('tracking-number', { men:rs[0], women:rs[1], kid:rs[2], lname:lname, customer:customer, fname:fname, moment:moment, token:token})
+   
+    }
+ });
+});
+
+router.get('/tracking-number', function (req, res, next) {
+  res.render('tracking-number');
+});
+
+router.post('/tracking-number', function (req, res, next) {
+  var {tracking_number, shipping_company, order_detail_id} = req.body;
+  var token = req.params.token;
+  var sdate = new Date();
+
+  const query = promisify(db.query.bind(db));
+  Promise.all([query("Update order_detail set tracking_number = ?, shipping_company = ?, ship_date = ?, shipping_status = 'shipped' where order_detail.order_detail_id = ?; ", [tracking_number, shipping_company, sdate, order_detail_id])])
+    .then(() => {
+      query('SELECT * FROM sodiq_business.order_detail join sodiq_business.`order` on sodiq_business.order_detail.order_id = sodiq_business.order.order_id join sodiq_business.stock on sodiq_business.order_detail.stock_id = sodiq_business.stock.stock_id join sodiq_business.product on sodiq_business.product.prod_id = sodiq_business.stock.prod_id join sodiq_business.customer on sodiq_business.customer.id = sodiq_business.order.cust_id where sodiq_business.order_detail.order_detail_id = ?', [order_detail_id])
+      .then((data) => {
+      console.log(data);
+
+      var email = data[0].email;
+      console.log(email);
+      //  console.log(email);
+         console.log('I am here bitches' + data);
+        var content = `
+        <!-- THIS EMAIL WAS BUILT AND TESTED WITH LITMUS http://litmus.com -->
+<!-- IT WAS RELEASED UNDER THE MIT LICENSE https://opensource.org/licenses/MIT -->
+<!-- QUESTIONS? TWEET US @LITMUSAPP -->
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<style type="text/css">
+/* CLIENT-SPECIFIC STYLES */
+body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+img { -ms-interpolation-mode: bicubic; }
+
+/* RESET STYLES */
+img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+table { border-collapse: collapse !important; }
+body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+
+/* iOS BLUE LINKS */
+a[x-apple-data-detectors] {
+color: inherit !important;
+text-decoration: none !important;
+font-size: inherit !important;
+font-family: inherit !important;
+font-weight: inherit !important;
+line-height: inherit !important;
+}
+
+/* MEDIA QUERIES */
+@media screen and (max-width: 480px) {
+.mobile-hide {
+display: none !important;
+}
+.mobile-center {
+text-align: center !important;
+}
+}
+
+/* ANDROID CENTER FIX */
+div[style*="margin: 16px 0;"] { margin: 0 !important; }
+</style>
+</head>
+<body style="margin: 0 !important; padding: 0 !important; background-color: #eeeeee;" bgcolor="#eeeeee">
+
+<!-- HIDDEN PREHEADER TEXT -->
+<div style="display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: Open Sans, Helvetica, Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;">
+Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus dolor aliquid omnis consequatur est deserunt, odio neque blanditiis aspernatur, mollitia ipsa distinctio, culpa fuga obcaecati!
+</div>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr>
+<td align="center" style="background-color: #eeeeee;" bgcolor="#eeeeee">
+<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+<tr>
+<td align="center" valign="top" width="600">
+<![endif]-->
+<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;">
+  <tr>
+      <td align="center" valign="top" style="font-size:0; padding: 35px;" bgcolor="#044767">
+      <!--[if (gte mso 9)|(IE)]>
+      <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+      <tr>
+      <td align="left" valign="top" width="300">
+      <![endif]-->
+      <div style="display:inline-block; max-width:50%; min-width:100px; vertical-align:top; width:100%;">
+          <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
+              <tr>
+                  <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 36px; font-weight: 800; line-height: 48px;" class="mobile-center">
+                      <h1 style="font-size: 36px; font-weight: 800; margin: 0; color: #ffffff;">Beretun</h1>
+                  </td>
+              </tr>
+          </table>
+      </div>
+      <!--[if (gte mso 9)|(IE)]>
+      </td>
+      <td align="right" width="300">
+      <![endif]-->
+      <div style="display:inline-block; max-width:50%; min-width:100px; vertical-align:top; width:100%;" class="mobile-hide">
+          <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
+              <tr>
+                  <td align="right" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; line-height: 48px;">
+                      <table cellspacing="0" cellpadding="0" border="0" align="right">
+                          <tr>
+                              <td style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400;">
+                                  <p style="font-size: 18px; font-weight: 400; margin: 0; color: #ffffff;"><a href="http://litmus.com" target="_blank" style="color: #ffffff; text-decoration: none;">Shop &nbsp;</a></p>
+                              </td>
+                              <td style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 24px;">
+                                  <a href="http://litmus.com" target="_blank" style="color: #ffffff; text-decoration: none;"><img src="shop.png" width="27" height="23" style="display: block; border: 0px;"/></a>
+                              </td>
+                          </tr>
+                      </table>
+                  </td>
+              </tr>
+          </table>
+      </div>
+      <!--[if (gte mso 9)|(IE)]>
+      </td>
+      </tr>
+      </table>
+      <![endif]-->
+      </td>
+  </tr>
+  <tr>
+      <td align="center" style="padding: 35px 35px 20px 35px; background-color: #ffffff;" bgcolor="#ffffff">
+      <!--[if (gte mso 9)|(IE)]>
+      <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+      <tr>
+      <td align="center" valign="top" width="600">
+      <![endif]-->
+      <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;">
+          <tr>
+              <td align="center" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding-top: 25px;">
+                  <img src="hero-image-receipt.png" width="125" height="120" style="display: block; border: 0px;" /><br>
+                  <h2 style="font-size: 30px; font-weight: 800; line-height: 36px; color: #333333; margin: 0;">
+                      Congratulations! Your Order has been Shipped
+                  </h2>
+              </td>
+          </tr>
+          <tr>
+              <td align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding-top: 10px;">
+                  <p style="font-size: 16px; font-weight: 400; line-height: 24px; color: #777777;">
+                      You can use the tracking number to track the product on the carrier website
+                  </p>
+              </td>
+          </tr>
+          <tr>
+              <td align="left" style="padding-top: 20px;">
+                  <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                      <tr>
+                          <td width="75%" align="left" bgcolor="#eeeeee" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px;">
+                              Order Confirmation #
+                          </td>
+                          <td width="25%" align="left" bgcolor="#eeeeee" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 800; line-height: 24px; padding: 10px;">
+                              ${data[0].order_id}
+                          </td>
+                      </tr>
+        ` 
+        
+        + data.reduce(function(a, b) {
+          return a + `
+          <tr>
+          <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">
+              Product
+          </td>
+          <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">
+              ${b.prod_name}
+          </td>
+          </tr>
+
+          <tr>
+          <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">
+          Tracking Number
+          </td>
+           <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">
+            ${b.tracking_number}
+            </td>
+           </tr> 
+      <tr>
+      <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">
+      Carrier
+      </td>
+      <td width="25%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;">
+       ${b.shipping_company}
+      </td>
+      </tr>
+
+     
+          `
+        }, '')
+
+        +
+        `
+
+</table>
+</td>
+</tr>
+<tr>
+<td align="left" style="padding-top: 20px;">
+
+</td>
+</tr>
+</table>
+<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->
+</td>
+</tr>
+<tr>
+<td align="center" height="100%" valign="top" width="100%" style="padding: 0 35px 35px 35px; background-color: #ffffff;" bgcolor="#ffffff">
+<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+<tr>
+<td align="center" valign="top" width="600">
+<![endif]-->
+<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:660px;">
+<tr>
+<td align="center" valign="top" style="font-size:0;">
+<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+<tr>
+<td align="left" valign="top" width="300">
+<![endif]-->
+<div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
+
+    <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
+        <tr>
+            <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
+                <p style="font-weight: 800;">Delivery Address</p>
+                <p>675 Massachusetts Avenue<br>11th Floor<br>Cambridge, MA 02139</p>
+
+            </td>
+        </tr>
+    </table>
+</div>
+<!--[if (gte mso 9)|(IE)]>
+</td>
+<td align="left" valign="top" width="300">
+<![endif]-->
+<div style="display:inline-block; max-width:50%; min-width:240px; vertical-align:top; width:100%;">
+    <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:300px;">
+        <tr>
+            <td align="left" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px;">
+                <p style="font-weight: 800;">Estimated Delivery Date</p>
+                <p>January 1st, 2016</p>
+            </td>
+        </tr>
+    </table>
+</div>
+<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->
+</td>
+</tr>
+</table>
+<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->
+</td>
+</tr>
+<tr>
+<td align="center" style=" padding: 35px; background-color: #1b9ba3;" bgcolor="#1b9ba3">
+<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+<tr>
+<td align="center" valign="top" width="600">
+<![endif]-->
+<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;">
+<tr>
+<td align="center" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding-top: 25px;">
+<h2 style="font-size: 24px; font-weight: 800; line-height: 30px; color: #ffffff; margin: 0;">
+    Get 25% off your next order.
+</h2>
+</td>
+</tr>
+<tr>
+<td align="center" style="padding: 25px 0 15px 0;">
+<table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+        <td align="center" style="border-radius: 5px;" bgcolor="#66b3b7">
+          <a href="http://litmus.com" target="_blank" style="font-size: 18px; font-family: Open Sans, Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 5px; background-color: #66b3b7; padding: 15px 30px; border: 1px solid #66b3b7; display: block;">Awesome</a>
+        </td>
+    </tr>
+</table>
+</td>
+</tr>
+</table>
+<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->
+</td>
+</tr>
+<tr>
+<td align="center" style="padding: 35px; background-color: #ffffff;" bgcolor="#ffffff">
+<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+<tr>
+<td align="center" valign="top" width="600">
+<![endif]-->
+<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;">
+<tr>
+<td align="center">
+<img src="logo-footer.png" width="37" height="37" style="display: block; border: 0px;"/>
+</td>
+</tr>
+<tr>
+<td align="center" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 24px; padding: 5px 0 10px 0;">
+<p style="font-size: 14px; font-weight: 800; line-height: 18px; color: #333333;">
+    675 Massachusetts Avenue<br>
+    Cambridge, MA 02139
+</p>
+</td>
+</tr>
+<tr>
+<td align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 24px;">
+<p style="font-size: 14px; font-weight: 400; line-height: 20px; color: #777777;">
+    If you didn't create an account using this email address, please ignore this email or <a href="http://litmus.com" target="_blank" style="color: #777777;">unsusbscribe</a>.
+</p>
+</td>
+</tr>
+</table>
+<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->
+</td>
+</tr>
+</table>
+<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->
+</td>
+</tr>
+</table>
+<!-- LITMUS ATTRIBUTION -->
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr>
+<td bgcolor="#ffffff" align="center">
+<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+<tr>
+<td align="center" valign="top" width="600">
+<![endif]-->
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;" >
+<tr>
+<td bgcolor="#ffffff" align="center" style="padding: 30px 30px 30px 30px; color: #666666; font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 18px;" >
+<p style="margin: 0;">This email was built and tested with Litmus. <a href="https://litmus.com?utm_campaign=litmus_templates&utm_source=litmus_community&utm_medium=templates" style="color: #5db3ec;">What's Litmus?</a></p>
+</td>
+</tr>
+</table>
+<!--[if (gte mso 9)|(IE)]>
+</td>
+</tr>
+</table>
+<![endif]-->
+</td>
+</tr>
+</table>
+<!-- END LITMUS ATTRIBUTION -->
+</body>
+</html>
+
+        `
+      
+
+        var smtpTransport = nodemailer.createTransport({
+          service: 'Gmail',
+          secure: false,
+          auth: {
+            user: 'tunjimikel@gmail.com',
+            pass: 'Layanhova@17'
+          },
+          tls: {
+            rejectUnauthorized: false
+          }
+      
+        });
+      
+        
+        var mailOptions = {
+       
+          to: email,
+          from: 'tunjimikel@gmail.com',
+          subject: 'Thanks For Your Purchase',
+         // text: 'Thanks for your purchase' ,
+          html: content
+      
+        };
+      
+      
+      
+        smtpTransport.sendMail(mailOptions, function (err) {
+          console.log('mail sent');
+      
+          if (err) {
+            console.log(err);
+          }
+          else{
+            Console.log('email has been sent');
+          }
+        });
+      
+      
+      })
+    })
+
+ req.flash('success_msg', 'Tracking Number Successfully added and sent to the Customer')
+ res.redirect('/profile');
+});
+
+
 
 
 // nav not logged in
@@ -272,15 +1557,10 @@ router.get('/navis', function (req, res, next) {
       console.log(rs[3]);
       var fname = req.user.fname;
       var lname= req.user.lname;
-
       res.render('navis', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3], lname:lname, fname:fname})
     }
   });
 });
-
-
-
-
 
 //test mysql connection
 router.get('/testconn', function (req, res, next) {
@@ -299,6 +1579,66 @@ router.get('/testconn', function (req, res, next) {
   }
 });
 
+//test
+//test mysql connection
+router.get('/test', function (req, res, next) {
+  //const query = promisify(db.query.bind(db));
+
+
+
+
+  
+  const query = promisify(db.query.bind(db));
+  Promise.all([query("UPDATE order_detail SET tracking_number = '232321166678000' where order_detail_id = ?", [81])])
+    .then(() => query('select * from order_detail where order_detail_id = ?', [81]))
+      .then((data) => {
+      console.log(data);
+      var t = '2';
+       } );
+    
+  /*
+  db.query(" SELECT * FROM sodiq_business.order_detail join sodiq_business.`order` on sodiq_business.order_detail.order_id = sodiq_business.order.order_id join sodiq_business.stock on sodiq_business.order_detail.stock_id = sodiq_business.stock.stock_id join sodiq_business.product on sodiq_business.product.prod_id = sodiq_business.stock.prod_id join sodiq_business.customer on sodiq_business.customer.id = sodiq_business.order.cust_id where sodiq_business.order_detail.order_detail_id = ?", [81], function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    console.log(rs);
+  });
+  */
+
+  var cars = [
+    {
+        'make': 'audi',
+        'model': 'r8',
+        'year': '2012'
+    }, {
+        'make': 'audi',
+        'model': 'rs5',
+        'year': '2013'
+    }, {
+        'make': 'ford',
+        'model': 'mustang',
+        'year': '2012'
+    }, {
+        'make': 'ford',
+        'model': 'fusion',
+        'year': '2015'
+    }, {
+        'make': 'kia',
+        'model': 'optima',
+        'year': '2012'
+    },
+];
+
+result = cars.reduce(function (r, a) {
+  r[a.make] = r[a.make] || [];
+  r[a.make].push(a);
+  return r;
+}, Object.create(null));
+
+// console.log(result);
+});
+
+
 // homepage shop
 
 router.get('/myaccount', ensureAuthenticated, function (req, res, next) {
@@ -316,23 +1656,19 @@ router.get('/myaccount', ensureAuthenticated, function (req, res, next) {
     }, {});
     console.log(group_to_values );
     */
-
    var fname = req.user.fname;
    var lname= req.user.lname;
-
       res.render('myaccount', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3], lname:lname, fname:fname})
     }
   });
 });
 
 router.get('/homeshop', function (req, res, next) {
-
   db.query("SELECT * FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id  left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id  left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id  left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id order by quantity desc Limit 4; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3;", function (err, rs) {
     if (err) {
       console.log(err);
     }
     else {
-
       /*
       var group_to_values = rs.reduce(function (obj, item) {
         obj[item.prod_id] = obj[item.prod_id] || [];
@@ -341,7 +1677,6 @@ router.get('/homeshop', function (req, res, next) {
     }, {});
     console.log(group_to_values );
     */
-
       res.render('homeshop', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3]})
     }
   });
@@ -379,7 +1714,6 @@ router.get('/searches', function (req, res, next) {
         fname = req.user.fname;
         lname= req.user.lname;
         }
-      
       res.render('homes', { data:rs[0], men:rs[1], women:rs[2], kid:rs[3],  lname:lname, fname:fname})
     }
   });
@@ -393,8 +1727,6 @@ router.get('/homes', function (req, res, next) {
       console.log(err);
     }
     else {
-
-
   //var result = new Array();
   //.reduce(function(res, value) {
     //  res[value.image] = { image: value.image };
@@ -403,8 +1735,6 @@ router.get('/homes', function (req, res, next) {
  // return res;
 //}, {});
 //console.log(result);
-
-
 
 
 rs.forEach(function(item){
@@ -458,13 +1788,15 @@ router.get('/details/:token', function(req, res) {
   var fname = "";
   var lname = "";
   var categorys = [];
+  var phones = [];
   var stockid = req.params.token;
 
-  db.query('SELECT *, sodiq_business.stock.description as descr FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id where sodiq_business.stock.stock_id = ? ;  SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3; ',[req.params.token] ,function (err, rs) {
+  db.query('SELECT *, sodiq_business.stock.description as descr FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id where sodiq_business.stock.stock_id = ? ;  SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3; SELECT * FROM sodiq_business.stock join sodiq_business.customer on sodiq_business.stock.seller_id = sodiq_business.customer.id where stock_id = ? ',[req.params.token, req.params.token] ,function (err, rs) {
     if (err) {
       console.log(err);
     }
     else {
+      console.log(rs[4]);
      
       //var str = rs[0].descr
      // var temp = new Array();
@@ -493,19 +1825,33 @@ router.get('/details/:token', function(req, res) {
     rs[0].map(data => {
       categorys.push(data.cat_id)
     })
-    console.log(categorys);
+
+
+
+    // get phone number
+  
+    console.log(rs[4]);
+    rs[4].map(data => {
+      phones.push(data.phone)
+    })
+    console.log(phones);
+  
 
       var cat =  parseInt(categorys)
+     var phone = phones.toString();
+     console.log(phone);
       console.log(cat);
+      phone = '234' + phone
+      
+     console.log(phone);
       
       console.log(stockid);
-      db.query('SELECT *, sodiq_business.stock.description as descr FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id where stock.cat_id = ? and stock.stock_id != ? order by stock.quantity desc limit 4 ',[cat, stockid] ,function (err, rsa) {
+      db.query('SELECT *, sodiq_business.stock.description as descr FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id where stock.cat_id = ? and stock.stock_id != ? order by stock.quantity desc limit 4;  ',[cat, stockid] ,function (err, rsa) {
         if (err) {
           console.log(err);
         }
-
         
-        res.render('product_page.ejs', { data:rs[0], men:rs[1], women:rs[2], kid:rs[3], lname:lname, fname:fname, rsa:rsa });
+        res.render('product_page.ejs', { data:rs[0], men:rs[1], women:rs[2], kid:rs[3], lname:lname, fname:fname, rsa:rsa, phone:phone});
         
       });
     
@@ -857,13 +2203,20 @@ router.post('/tes',    function (req, res, next) {
 
 // Add Products
 
-router.get('/add_product',    function (req, res, next) {
+router.get('/add_product', ensureAuthenticated,    function (req, res, next) {
   db.query(" Select * from category; select * from supplier ; select * from color ; select * from size ; select * from product ; select * from description ; select * from gender ; select * from product_type ;  " ,  function (err, rs) {
     if (err) {
       console.log(err);
     }
     else {
+      console.log(req.user.cust_type);
+      if (req.user.cust_type == 'seller') {
       res.render('add_product' , { categ:rs[0], supp:rs[1], size:rs[3], color:rs[2], product:rs[4], description:rs[5], product_type:rs[7], gender:rs[6] });
+      }
+      else{
+        req.flash('success_msg', 'You have to be a Seller to add products')
+        res.redirect('/myaccount')
+      }
     }
   });
 });
@@ -948,7 +2301,7 @@ router.post('/add_product',  function (req, res, next) {
       ptypeid = rs[6][0].p_type_id;
 
        // const full_name = req.user.first_name + ' ' + req.user.last_name;
-        db.query("insert into stock(prod_id , cat_id , sup_id, color_id, size_id, price, image1,  image2, image3,  image4, quantity, description, gender_id, p_type_id) values ('" + prodid + "', '" + catid + "' , '" + supid + "', '" + colorid + "', '" + sizeid + "', '" + price + "',  '" + pic1 + "', '" + pic2 + "', '" + pic3 + "', '" + pic4 + "', '" + quant + "','" + description + "', '" + genderid + "', '" + ptypeid + "')", function (err, rs) {
+        db.query("insert into stock(prod_id , cat_id , sup_id, color_id, size_id, price, image1,  image2, image3,  image4, quantity, description, gender_id, p_type_id, seller_id) values ('" + prodid + "', '" + catid + "' , '" + supid + "', '" + colorid + "', '" + sizeid + "', '" + price + "',  '" + pic1 + "', '" + pic2 + "', '" + pic3 + "', '" + pic4 + "', '" + quant + "','" + description + "', '" + genderid + "', '" + ptypeid + "', '"+req.user.id+"')", function (err, rs) {
           if (err) {
             console.log(err);
             req.flash('error', 'Error: Product not Inserted');
@@ -1562,8 +2915,6 @@ router.post('/reset/:token', function (req, res) {
         });
 
     }));
-
-
   }
 });
 
@@ -1757,18 +3108,6 @@ router.get('/dashboard',  ensureAuthenticated, function (req, res, next) {
     });
   });
 });
-
-
-
-
-
-
-
-
-
-
-
-
 
 router.get('/sales-reports',  ensureAuthenticated, function (req, res, next) {
   db.query("SELECT  DATE_FORMAT(date,'%b/%Y') as dates, SUM(quantity) as quant, (SUM(quantity * price))  as rev, sum(price) as prices from layanenterprises.Sales where layanenterprises.Sales.clientid = ? GROUP BY YEAR(date), MONTH(date) order by date desc limit 7; SELECT *, ((quantity) * (price))  as tot from category join Products on category.cat_id = Products.categoryid right outer join Sales on layanenterprises.Sales.prod_id = Products.prod_id left outer join Customer on Sales.cust_id = Customer.cust_id where Sales.clientid = ? order by date ", [req.user.clientid, req.user.clientid], function (err, rs) {
@@ -2678,13 +4017,6 @@ router.get('/netprofit',  ensureAuthenticated, function (req, res, next) {
     });
   });
   
-
-
-
-
-
-
-
   // sales
 router.get('/saler',  ensureAuthenticated, function (req, res, next) {
   const prodss = [];

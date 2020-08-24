@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    .post-container {
+    margin: 20px 20px 0 0;  
+    border: 1px solid #333;
+    overflow: auto;
+    background-color: rgb(243, 243, 243);
+}
+.post-thumb {
+    float: left
+}
+.post-thumb img {
+    display: block;
+    overflow: hidden;
+    width: 160px;
+    height: 210px;
+}
+.post-content {
+    margin-left: 210px
+}
+
+.post-content p {
+    margin-bottom: 1px;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif ;
+    font-size: 15px;
+}
+
+.post-title {
+    font-weight: bold;
+    font-size: 21px;
+    margin-top: 15px;
+}
+
+
+</style>
+
+<% include ./navis %>
+<body>
+
+<%if (customer == 'buyer') { %>
+    <% data.forEach(function(item) { %>
+        <%if (item.shipping_status == 'unshipped') { %>
+            <div class="post-container">                
+                <div class="post-thumb"><img src="/<%= item.image1 %>" /></div>
+                <div class="post-content">
+                    <h6 class="post-title"><%= item.prod_name %></h6>
+                    <p><span>Price:</span> <%= item.price %></p>
+                    <p><span >Date Purchased:</span> <%= moment(item.date).format("ll") %></p>
+                    <p  style="color: red; font-weight: bold;"><%= item.shipping_status %></p>
+                </div>       
+            </div>
+        <% } %>
+        
+
+        <%if (item.shipping_status == 'shipped' ) { %>
+           <div class="post-container">                
+            <div class="post-thumb"><img src="/<%= item.image1 %>" /></div>
+            <div class="post-content">
+                <h6 class="post-title"><%= item.prod_name %></h6>
+                <p><span>Price:</span> <%= item.price %></p>
+                <p><span >Date Purchased:</span> <%= moment(item.date).format("ll") %></p>
+                <a><span >Tracking Number:</span> <%= item.tracking_number %></p></a>
+                <a><p><span >Shipping Company:</span> <%= item.shipping_company%></p></a>
+
+                <p  style="color: green; font-weight: bold;"><%= item.shipping_status %></p>
+            </div>       
+            </div>
+        <% } %>
+    <% }); %>  
+<% } %>
+
+
+
+<%if (customer == 'seller') { %>
+    <% seller.forEach(function(item) { %>
+        <%if (item.shipping_status == 'unshipped') { %>
+            <div class="post-container">                
+                <div class="post-thumb"><img src="/<%= item.image1 %>" /></div>
+                <div class="post-content">
+                    <h6 class="post-title"><%= item.prod_name %></h6>
+                    <p><span>Price:</span> <%= item.price %></p>
+                    <p><span >Date Purchased:</span> <%= moment(item.date).format("ll") %></p>
+                    <a href="/tracking-number/<%= item.order_detail_id %>" ><p>Add Tracking Number</p></a>
+                    <p  style="color: red; font-weight: bold;"><%= item.shipping_status %></p>
+                </div>       
+            </div>
+        <% } %>
+
+        <%if (item.shipping_status == 'shipped') { %>
+        <div class="post-container">                
+            <div class="post-thumb"><img src="/<%= item.image1 %>" /></div>
+            <div class="post-content">
+                <h6 class="post-title"><%= item.prod_name %></h6>
+                <p><span>Price:</span> <%= item.price %></p>
+                <p><span >Date Purchased:</span> <%= moment(item.date).format("ll") %></p>
+                <a><span >Tracking Number:</span> <%= item.tracking_number %></p></a>
+                <a><p><span >Shipping Company:</span> <%= item.shipping_company%></p></a>
+
+                <p  style="color: green; font-weight: bold;"><%= item.shipping_status %></p>
+            </div>       
+        </div>
+        <% } %>
+    
+    <% }); %>  
+<% } %>
+    
+</body>
+</html>

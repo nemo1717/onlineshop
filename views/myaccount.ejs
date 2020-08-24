@@ -1301,6 +1301,7 @@ footer .copy-right {
 				<div class="collapse navbar-collapse" id="navbarSupportedContent">
 				  <ul class="navbar-nav mr-auto">
 					<a class="nav-link" style="color:honeydew"><h6><%= fname %>, <%= lname %></h6></a>
+					<a class="nav-link" href="/Profile" style="color:honeydew"><h6>Profile</h6></a>
 					<a class="nav-link" href="/logout" style="color:honeydew"><h6>Logout</h6></a>
 				
 				  </ul>
@@ -1423,11 +1424,13 @@ footer .copy-right {
 				</div>
 			  </nav>
 
+			  <% include ./partials/messages %>
+
                 <div id="header-hero">
                     <div class="header-bg"> <img src="/images/myheader.jpg" alt="header-image" /></div>
                     <div class="header-content">
                         <p class="heading-1">fashion collection 2017</p>
-						<h1>wellcome to brand<span class="logo-style">y</span> unique store</h1>
+						<h1>welcome to brand<span class="logo-style">y</span> unique store</h1>
 						<div class="button">
                             <a href="/homes" ><p style="color:honeydew;">shop now</p></a>
                         </div>

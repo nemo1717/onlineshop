@@ -199,6 +199,11 @@ font-family: Raleway,sans-serif;
         <a href="/addcart/<%= item.stock_id %>" class="btn btn-danger text-light"><i class="fa fa-cart-plus" aria-hidden="true"></i>  Add To Cart</a> <br/><br/>
       </div>
 
+      <div id="size" class="row mt-4">
+    <a class="btn btn-success" href="https://api.whatsapp.com/send?phone=<%= phone %>">Click to Contact Seller</a>
+   
+</div>
+
   </div>
 
       <!-- SELLER IF NEEDED 
@@ -250,6 +255,8 @@ font-family: Raleway,sans-serif;
                 </div>
                 <a class="add-to-cart" href="/addcart/<%= item.stock_id %>" >+ Add To Cart</a>
             </div>
+
+
         </div>
       </div>  
      <% }); %>  
