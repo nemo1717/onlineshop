@@ -4047,6 +4047,7 @@ router.post('/saler', function (req, res, next) {
       }
       else {
         console.log(rs[0][0].prod_id);
+
         var pid = rs[0][0].prod_id; 
         console.log(pid);
    
