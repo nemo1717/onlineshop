@@ -152,7 +152,7 @@ font-family: Raleway,sans-serif;
       </div>
 
 
-      <%if ( quantity != 0 ) { %>
+      <%if ( item.quantity != 0 ) { %>
         <div class="row">
        
           <h6 style="font-size: 14px; color: rgb(139, 86, 86);" >Quantity Available: <%= item.quantity %></h6>
@@ -215,7 +215,7 @@ font-family: Raleway,sans-serif;
         </div>
       <% } %>
 
-      <%if (quantity == 0) { %>
+      <%if (item.quantity == 0) { %>
         <div class="row">
        
           <h6 style="font-size: 17px; color: rgb(139, 86, 86);" > Item Out of Stock </h6>
