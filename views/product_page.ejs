@@ -85,10 +85,25 @@ font-family: Raleway,sans-serif;
   .itemcontainer {
 
   width: auto;
+
   background: none;
-
-
 }
+}
+
+@media only screen and (max-width: 768px) {
+  .carousel-inner {
+    width: auto;
+  height: auto;
+  overflow: hidden;
+  border: 1px solid black;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .carousel-inner img {
+    width: 100%;
+    min-height: 100%;
+  }
 }
 
 </style>
@@ -136,6 +151,80 @@ font-family: Raleway,sans-serif;
         -->
       </div>
 
+
+      <%if ( quantity != 0 ) { %>
+        <div class="row">
+       
+          <h6 style="font-size: 14px; color: rgb(139, 86, 86);" >Quantity Available: <%= item.quantity %></h6>
+  
+        </div>
+
+        <hr>
+
+        <div  class="row">
+        <ul>
+          <div id =  "container"></div>
+        </ul>  
+        </div>
+        <!--
+        <div class="row mt-4">
+          <h3 class="text-info"><i class="fa fa-map-marker" aria-hidden="true"></i></h3>
+          <p style="font-size: 20px"> &nbsp; Delivery by23 Jul, Tuesday | &nbsp; <span class="text-success">FREE</span> </p>
+        </div>
+        -->
+        <hr>
+        
+        <div id="size" class="row mt-4">
+          <h6>Size: &nbsp; &nbsp;</h6>
+          <div class="dropdown show">
+              <select class="form-control">
+                  <option value="one">Small</option>
+                  <option value="two">Medium</option>
+                  <option value="three">Large</option>
+              </select>
+        </div>
+        </div>
+  
+        <div id="size" class="row mt-4">
+          <h6>Colour: &nbsp; &nbsp;</h6>
+          <div class="dropdown show">
+              <select class="form-control">
+                  <option value="one">Red</option>
+                  <option value="two">Blue</option>
+                  <option value="three">Black</option>
+              </select>
+          </div>
+        </div>
+  
+        <div id="size" class="row mt-4">
+          <h6> Quantity: &nbsp; &nbsp;</h6>
+          <div class="dropdown show">
+              <select class="form-control">
+                  <option value="one">1</option>
+                  <option value="two">2</option>
+                  <option value="three">3</option>
+              </select>
+          </div>
+        </div>
+  
+        <hr>
+  
+        <div id="size" class="row mt-4">
+          <!--<a href="#" class="btn btn-success text-light"> Buy Now</a> &nbsp; -->
+          <a href="/addcart/<%= item.stock_id %>" class="btn btn-danger text-light"><i class="fa fa-cart-plus" aria-hidden="true"></i>  Add To Cart</a> <br/><br/>
+        </div>
+      <% } %>
+
+      <%if (quantity == 0) { %>
+        <div class="row">
+       
+          <h6 style="font-size: 17px; color: rgb(139, 86, 86);" > Item Out of Stock </h6>
+  
+        </div>
+      <% } %>
+
+
+
       <!-- REVIEW WHEN NEEDED
       <div class="row">
         <h3 class="text-warning"><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i> <i class="fa fa-star-half-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i></h3>
@@ -144,60 +233,7 @@ font-family: Raleway,sans-serif;
       </div>
        -->
 
-       <hr>
 
-      <div  class="row">
-      <ul>
-        <div id =  "container"></div>
-      </ul>  
-      </div>
-      <!--
-      <div class="row mt-4">
-        <h3 class="text-info"><i class="fa fa-map-marker" aria-hidden="true"></i></h3>
-        <p style="font-size: 20px"> &nbsp; Delivery by23 Jul, Tuesday | &nbsp; <span class="text-success">FREE</span> </p>
-      </div>
-      -->
-      <hr>
-      
-      <div id="size" class="row mt-4">
-        <h6>Size: &nbsp; &nbsp;</h6>
-        <div class="dropdown show">
-            <select class="form-control">
-                <option value="one">Small</option>
-                <option value="two">Medium</option>
-                <option value="three">Large</option>
-            </select>
-      </div>
-      </div>
-
-      <div id="size" class="row mt-4">
-        <h6>Colour: &nbsp; &nbsp;</h6>
-        <div class="dropdown show">
-            <select class="form-control">
-                <option value="one">Red</option>
-                <option value="two">Blue</option>
-                <option value="three">Black</option>
-            </select>
-        </div>
-      </div>
-
-      <div id="size" class="row mt-4">
-        <h6> Quantity: &nbsp; &nbsp;</h6>
-        <div class="dropdown show">
-            <select class="form-control">
-                <option value="one">1</option>
-                <option value="two">2</option>
-                <option value="three">3</option>
-            </select>
-        </div>
-      </div>
-
-      <hr>
-
-      <div id="size" class="row mt-4">
-        <!--<a href="#" class="btn btn-success text-light"> Buy Now</a> &nbsp; -->
-        <a href="/addcart/<%= item.stock_id %>" class="btn btn-danger text-light"><i class="fa fa-cart-plus" aria-hidden="true"></i>  Add To Cart</a> <br/><br/>
-      </div>
 
       <div id="size" class="row mt-4">
     <a class="btn btn-success" href="https://api.whatsapp.com/send?phone=<%= phone %>">Click to Contact Seller</a>

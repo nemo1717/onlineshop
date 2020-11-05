@@ -56,6 +56,258 @@ router.get('/', function (req, res, next) {
 });
 
 
+/* edit profile */
+router.get('/edit-profile', function (req, res, next) {
+  var fname = "";
+  var lname = "";
+  
+  db.query('SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3; SELECT * FROM sodiq_business.customer where id = ?', [req.user.id], function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      if(req.user) {
+        fname = req.user.fname;
+        lname= req.user.lname;
+        }
+      res.render('edit-profile', { men:rs[0], women:rs[1], kid:rs[2], data:rs[3],  lname:lname, fname:fname})
+    }
+  });
+});
+
+router.post('/edit-profile', ensureAuthenticated, function (req, res, next) {
+ 
+  const { fname, lname, addy, city, state, country, email,   phone  } = req.body;
+  
+  db.query('update customer set fname = ?, lname = ?, address = ?, city = ?, state = ?, country = ?, email = ?, phone = ? where id = ? ', [fname, lname, addy, city, state, country, email, phone, req.user.id], function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+
+      req.flash('success_msg', 'Your Profile has been successfully Updated')
+      res.redirect('/profile');
+      
+    }
+  });
+});
+
+
+
+
+/* contact form */
+router.get('/contact', function (req, res, next) {
+
+  var fname = "";
+  var lname = "";
+  
+  db.query('SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3;', function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      if(req.user) {
+        fname = req.user.fname;
+        lname= req.user.lname;
+        }
+      res.render('contact', { men:rs[0], women:rs[1], kid:rs[2],  lname:lname, fname:fname})
+    }
+  });
+});
+
+router.post('/contact', function (req, res, next) {
+
+  const {firstname, lastname, phone, email, topic, subject} = req.body;
+
+
+  
+  db.query('insert into contact(fname, lname, phone, email, topic, subject) values (?,?,?,?,?,?)', [firstname, lastname, phone, email, topic, subject] , function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+
+      var email_to_send = `
+                <!DOCTYPE html>
+<!-- Set the language of your main document. This helps screenreaders use the proper language profile, pronunciation, and accent. -->
+<html lang="en">
+  <head>
+    <!-- The title is useful for screenreaders reading a document. Use your sender name or subject line. -->
+    <title>An Accessible Account Update Email</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- Never disable zoom behavior! Fine to set the initial width and scale, but allow users to set their own zoom preferences. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <style type="text/css">
+        /* CLIENT-SPECIFIC STYLES */
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; }
+
+        /* RESET STYLES */
+        img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        table { border-collapse: collapse !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+
+        /* iOS BLUE LINKS */
+        a[x-apple-data-detectors] {
+            color: inherit !important;
+            text-decoration: none !important;
+            font-size: inherit !important;
+            font-family: inherit !important;
+            font-weight: inherit !important;
+            line-height: inherit !important;
+        }
+
+        /* GMAIL BLUE LINKS */
+        u + #body a {
+            color: inherit;
+            text-decoration: none;
+            font-size: inherit;
+            font-family: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+        }
+
+        /* SAMSUNG MAIL BLUE LINKS */
+        #MessageViewBody a {
+            color: inherit;
+            text-decoration: none;
+            font-size: inherit;
+            font-family: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+        }
+
+        /* These rules set the link and hover states, making it clear that links are, in fact, links. */
+        /* Embrace established conventions like underlines on links to keep emails accessible. */
+        a { color: #B200FD; font-weight: 600; text-decoration: underline; }
+        a:hover { color: #000000 !important; text-decoration: none !important; }
+
+        /* These rules adjust styles for desktop devices, keeping the email responsive for users. */
+        /* Some email clients don't properly apply media query-based styles, which is why we go mobile-first. */
+        @media screen and (min-width:600px) {
+            h1 { font-size: 48px !important; line-height: 48px !important; }
+            .intro { font-size: 24px !important; line-height: 36px !important; }
+        }
+    </style>
+  </head>
+  <body style="margin: 0 !important; padding: 0 !important;">
+
+    <!-- Some preview text. -->
+    <div style="display: none; max-height: 0; overflow: hidden;">
+            
+    </div>
+    <!-- Get rid of unwanted preview text. -->
+    <div style="display: none; max-height: 0px; overflow: hidden;">
+    &nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;
+    </div>
+
+    <!-- This ghost table is used to constrain the width in Outlook. The role attribute is set to presentation to prevent it from being read by screenreaders. -->
+    <!--[if (gte mso 9)|(IE)]>
+    <table cellspacing="0" cellpadding="0" border="0" width="600" align="center" role="presentation"><tr><td>
+    <![endif]-->
+    <!-- The role and aria-label attributes are added to wrap the email content as an article for screen readers. Some of them will read out the aria-label as the title of the document, so use something like "An email from Your Brand Name" to make it recognizable. -->
+    <!-- Default styling of text is applied to the wrapper div. Be sure to use text that is large enough and has a high contrast with the background color for people with visual impairments. -->
+    <div role="article" aria-label="An email from Your Brand Name" lang="en" style="background-color: white; color: #2b2b2b; font-family: 'Avenir Next', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; font-size: 18px; font-weight: 400; line-height: 28px; margin: 0 auto; max-width: 600px; padding: 40px 20px 40px 20px;">
+        
+        <!-- Logo section and header. Headers are useful landmark elements. -->
+        <header>
+            <!-- Since this is a purely decorative image, we can leave the alternative text blank. -->
+            <!-- Linking images also helps with Gmail displaying download links next to them. -->
+            <a href="https://litmus.com/community">
+                <center><img src="logo@2x.png" alt="" height="80" width="80"></center>
+            </a>
+            <!-- The h1 is the main heading of the document and should come first. -->
+            <!-- We can override the default styles inline. -->
+            <h1 style="color: #000000; font-size: 17px; font-weight: 800; line-height: 32px; margin: 48px 0; text-align: center;">
+                Thank For Reaching Out to Us.
+            </h1>
+        </header>
+
+        <!-- Main content section. Main is a useful landmark element. -->
+        <main>
+            <!-- This div is purely presentational, providing a container for the message. -->
+            <div style="background-color: ghostwhite; border-radius: 4px; padding: 24px 48px;">
+                <!-- This ghost table is used solely for padding in Word-based Outlook clients. -->
+                <!--[if (gte mso 9)|(IE)]>
+                <table cellspacing="0" cellpadding="0" border="0" width="600" align="center" role="presentation"><tr><td style="background-color: ghostwhite;font-family: 'Avenir Next', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; padding: 24px 48px 24px 48px;">
+                <![endif]-->
+
+                <!-- Body copy -->
+                <p>
+                    Thank for reaching out to TOPSHELF. We have received your request. We will get back to you withing 24 hours. 
+                    Thanks for your patience.
+                </p>
+        
+                <!-- This link uses descriptive text to inform the user what will happen with the link is tapped. -->
+                <!-- It also uses inline styles since some email clients won't render embedded styles from the head. -->
+                <a href="https://litmus.com/community" style="color: #B200FD; text-decoration: underline;">Continue Shopping</a>
+
+                <p>
+                    If you think this email was sent in error, please ignore it. Thank you!  
+                </p>
+                <!--[if (gte mso 9)|(IE)]>
+                </td></tr></table>
+                <![endif]-->
+            </div>
+        </main>
+
+        <!-- Footer information. Footer is a useful landmark element. -->
+        <footer>
+            <!-- Since this is a transactional email, you aren't required to include opt-out language. -->
+            <p style="font-size: 16px; font-weight: 400; line-height: 24px; margin-top: 48px;">
+                TOPSHELF.COM
+            </p>
+  
+        </footer>
+
+    </div>
+    <!--[if (gte mso 9)|(IE)]>
+    </td></tr></table>
+    <![endif]-->
+  </body>
+</html>   
+                `
+
+      var smtpTransport = nodemailer.createTransport({
+        service: 'Gmail',
+        secure: false,
+        auth: {
+          user: 'tunjimikel@gmail.com',
+          pass: 'Layanhova@17'
+        },
+        tls: {
+          rejectUnauthorized: false
+        }
+      });
+    
+      var mailOptions = {
+        to: email,
+        from: 'tunjimikel@gmail.com',
+        subject: 'Thanks For Your Purchase',
+       // text: 'Thanks for your purchase' ,
+        html: email_to_send
+      };
+    
+      smtpTransport.sendMail(mailOptions, function (err) {
+        console.log('mail sent');
+    
+        if (err) {
+          console.log(err);
+        }
+        else{
+          Console.log('email has been sent');
+        }
+      });
+
+      req.flash('success_msg', 'We have received your request and we will get back to you shortly')
+      res.redirect('/contact');
+    }
+  });
+});
+
+
 // testing
 router.get('/testing', function (req, res, next) {
   var results = [ { 
@@ -87,6 +339,7 @@ res.render('testing')
 router.get('/sucess', function (req, res, next) {
   var stockid = [];
   var cartid = [];
+  var stockids = [];
   //var addy = 0;
   var options = {
     'method': 'GET',
@@ -797,13 +1050,26 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus dolor aliquid om
                 
 
                 // Delete cart sold
-                   db.query("DELETE FROM cart where user_id = ?;", [req.user.id],  function (err, rs) {
-                        if (err) {
-                          console.log(err)
-                        }
-                          console.log('deleted');
-                        
-                  });
+                console.log("yhhhhhgggg" + cust_id)
+            
+
+                           db.query("UPDATE stock SET quantity = quantity - 1 WHERE stock_id in (SELECT stock_id FROM cart where user_id  = ? );", [cust_id],  function (err, rs) {
+                            if (err) {
+                              console.log(err)
+                            }
+                            else {
+                              console.log("quantity updated");
+                              db.query("DELETE FROM cart where user_id = ?; );", [cust_id],  function (err, rs) {
+                                if (err) {
+                                  console.log(err)
+                                }
+                                else {
+                                  console.log("Cart Deleted");
+                                  
+                                }
+                              });
+                            }
+                          });
               }
             });
           }
@@ -1658,7 +1924,8 @@ router.get('/myaccount', ensureAuthenticated, function (req, res, next) {
     */
    var fname = req.user.fname;
    var lname= req.user.lname;
-      res.render('myaccount', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3], lname:lname, fname:fname})
+   var status = req.user.cust_type
+      res.render('myaccount', {data:rs[0], men:rs[1], women:rs[2], kid:rs[3], lname:lname, fname:fname, status:status})
     }
   });
 });
@@ -1790,6 +2057,7 @@ router.get('/details/:token', function(req, res) {
   var categorys = [];
   var phones = [];
   var stockid = req.params.token;
+ 
 
   db.query('SELECT *, sodiq_business.stock.description as descr FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id where sodiq_business.stock.stock_id = ? ;  SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3; SELECT * FROM sodiq_business.stock join sodiq_business.customer on sodiq_business.stock.seller_id = sodiq_business.customer.id where stock_id = ? ',[req.params.token, req.params.token] ,function (err, rs) {
     if (err) {
@@ -1802,20 +2070,11 @@ router.get('/details/:token', function(req, res) {
      // var temp = new Array();
      // temp = str.split(",");
      // console.log(str);
-  
-     
-  
-    
      if(req.user) {
       fname = req.user.fname;
       lname= req.user.lname;
 
       }
-      
-    
-  
-
-
     // rs[0].forEach(function(item) {
     //   console.log(item.cat_id)
       
@@ -1825,18 +2084,12 @@ router.get('/details/:token', function(req, res) {
     rs[0].map(data => {
       categorys.push(data.cat_id)
     })
-
-
-
-    // get phone number
-  
+// get phone number
     console.log(rs[4]);
     rs[4].map(data => {
       phones.push(data.phone)
     })
     console.log(phones);
-  
-
       var cat =  parseInt(categorys)
      var phone = phones.toString();
      console.log(phone);
@@ -1849,12 +2102,15 @@ router.get('/details/:token', function(req, res) {
       db.query('SELECT *, sodiq_business.stock.description as descr FROM sodiq_business.stock left join sodiq_business.category on sodiq_business.stock.cat_id = sodiq_business.category.cat_id left join sodiq_business.color on sodiq_business.stock.color_id = sodiq_business.color.color_id left join sodiq_business.size on sodiq_business.stock.size_id = sodiq_business.size.size_id  left join sodiq_business.product on sodiq_business.stock.prod_id = sodiq_business.product.prod_id left join sodiq_business.supplier on  sodiq_business.stock.sup_id = sodiq_business.supplier.sup_id where stock.cat_id = ? and stock.stock_id != ? order by stock.quantity desc limit 4;  ',[cat, stockid] ,function (err, rsa) {
         if (err) {
           console.log(err);
+
         }
+
         
-        res.render('product_page.ejs', { data:rs[0], men:rs[1], women:rs[2], kid:rs[3], lname:lname, fname:fname, rsa:rsa, phone:phone});
+        var quantity = rs[1][0].quantity
+        console.log(quantity);
         
-      });
-    
+        res.render('product_page.ejs', { data:rs[0], quantity:quantity, men:rs[1], women:rs[2], kid:rs[3], lname:lname, fname:fname, rsa:rsa, phone:phone});
+      });  
     }
   });
 });
@@ -2301,6 +2557,7 @@ router.post('/add_product',  function (req, res, next) {
       ptypeid = rs[6][0].p_type_id;
 
        // const full_name = req.user.first_name + ' ' + req.user.last_name;
+       console.log(req.user.id);
         db.query("insert into stock(prod_id , cat_id , sup_id, color_id, size_id, price, image1,  image2, image3,  image4, quantity, description, gender_id, p_type_id, seller_id) values ('" + prodid + "', '" + catid + "' , '" + supid + "', '" + colorid + "', '" + sizeid + "', '" + price + "',  '" + pic1 + "', '" + pic2 + "', '" + pic3 + "', '" + pic4 + "', '" + quant + "','" + description + "', '" + genderid + "', '" + ptypeid + "', '"+req.user.id+"')", function (err, rs) {
           if (err) {
             console.log(err);
@@ -2506,8 +2763,21 @@ function checkFileType(file, cb) {
 
 //register page
 router.get('/register', function (req, res) {
-  const states = ['Abia',	'Adamawa',	'Akwa Ibom',	'Anambra',	'Bauchi',	'Bayelsa',	'Benue',	'Borno',	'Cross River',	'Delta',	'Ebonyi',	'Edo',	'Ekiti',	'Enugu',	'Gombe',	'Imo',	'Jigawa',	'Kaduna',	'Kano',	'Katsina',	'Kebbi',	'Kogi',	'Kwara',	'Lagos',	'Nasarawa',	'Niger',	'Ogun',	'Ondo',	'Osun',	'Oyo',	'Plateau',	'Rivers',	'Sokoto',	'Taraba',	'Yobe',	'Zamfara',	'Abuja']
-  res.render('register', {state:states});
+  var fname = "";
+  var lname = "";
+  
+  db.query('SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3;', function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      if(req.user) {
+        fname = req.user.fname;
+        lname= req.user.lname;
+        }
+      res.render('register', { men:rs[0], women:rs[1], kid:rs[2],  lname:lname, fname:fname})
+    }
+  });
 });
 
 
@@ -2715,7 +2985,21 @@ router.get('/confirm/:token', function (req, res) {
 
 //Login page
 router.get('/login', function (req, res) {
-  res.render('login');
+  var fname = "";
+  var lname = "";
+  
+  db.query('SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3;', function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      if(req.user) {
+        fname = req.user.fname;
+        lname= req.user.lname;
+        }
+      res.render('login', { men:rs[0], women:rs[1], kid:rs[2],  lname:lname, fname:fname})
+    }
+  });
 });
 
 
@@ -2739,7 +3023,21 @@ router.get('/logout', function (req, res, next) {
 
 // forget password page
 router.get('/forget-password',  function (req, res) {
-  res.render('forget-password');
+  var fname = "";
+  var lname = "";
+  
+  db.query('SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3;', function (err, rs) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      if(req.user) {
+        fname = req.user.fname;
+        lname= req.user.lname;
+        }
+      res.render('forget-password', { men:rs[0], women:rs[1], kid:rs[2],  lname:lname, fname:fname})
+    }
+  });
 });
 
 // forget password post
@@ -2761,7 +3059,7 @@ router.post('/forget-password', function (req, res, next) {
   // validation passed
   else {
     console.log(email);
-    db.query("select * from register where email = ? ",
+    db.query("select * from customer where email = ? ",
       email, function (err, data) {
         if (!data.length) {
           errors.push({ msg: 'That email is not registered ' });
@@ -2786,7 +3084,7 @@ router.post('/forget-password', function (req, res, next) {
 
               var d = new Date(Date.now() + 3600000).toISOString().slice(0, 19).replace('T', ' ');
 
-              db.query("update register set resetpasswordtoken = ?, resetpasswordexpire = ? where id = ?",
+              db.query("update customer set resetpasswordtoken = ?, resetpasswordexpire = ? where id = ?",
                 [token, d, data[0].id], function (err, data) {
                   if (!err) {
                     console.log('inset me');
@@ -2805,28 +3103,26 @@ router.post('/forget-password', function (req, res, next) {
             function (token, data, done) {
 
               var smtpTransport = nodemailer.createTransport({
-                host: 'smtp.gmail.com',
-                port: 465,
-                secure: true,
-                //service: 'Gmail', 
+                service: 'Gmail',
+                secure: false,
                 auth: {
-                  type: 'OAuth2',
-                  user: 'info@partifest.com',
-                  serviceClient: "102086845611841503378",
-                  privateKey: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCwORit6+APfwO/\nVj4ofvy1Jpr+VRQZJdc9vBRtB2TCSCi1Q7C20iiqHLL62b7x6JQECrFFYXMlF8RE\nZJxyZXaJeq8hrAZSY64JGvj8XNMzAElA/gDeSJ6gWSJv/KU2NcAt3OoVSzTwoEo3\nmdvnEld2sebjaIw+drvwS/TeWFJtXVvqqtb0FhYulxHmAQyyVtR6q42Cyfh/aroc\nVZVHywxiCViqztwnpw3UF/1mxx0b6aqjVjxlxHHMz5qyWUBez7Ksgn6Hcv2laEzb\n8H6qOlvlBmo495lpxm1+8BRS4nMm8P5OMXeS7DnoFZ6ToNRKD10TxlqqzSAqaOke\nWKhNmbcPAgMBAAECggEABMkNeNjulQfPnpLao0I3iI/Le7FBwiEQmZY8Pm20oxX5\n4lo74pW4ZvjaigyprmtbbEoCCwPyGtrCCKgWxisn2eSL/EUYnYTOxWPcc7Xtl5/1\nXUod1JYc60vLBJwpZwcfTd+G4nHQC+ITwd4au56i42VCA4DjoLqcBegky849hsdh\nBopgEq5O0qL/DBvZ0gOhoLhaWePvkoQPq8ahFu/S7bMMwFmN/Rts3XVWgnA3io/Q\nrIF9dS47ocCShNL2THboIxS9AjN1Fp/a/POVbzoNAQ4Q7M2XatbdEj+tsdh3ltHk\nTQX1TMHaX5GbzSJ+xkffqYE0L1LxsUc+nOCKgSY1KQKBgQDc7bGOWjMFgWbEbfuo\nekFKBRf1di0C+X4eyLhpk0Yj/l/0juoFXhp7cKo565OLzo65VCbxD3RSpbrRyA7P\nAQq9goi+CA09oDdEX9KSIF8L219J5xCZI9+BHfw9Ku2Lym2nprBq5wYVJus8cTef\njuOz+UD8xKQJB0AGvTyTBHISUwKBgQDMMp55yezSfpu0vGk7Sj1j25EjZvSv7poP\nPi97jgdM9YaccIclVBw7L5EPCH+qaU5k3koB1KfAaE97wY+RVbt5HxvtPirsQ/cF\nx43s5sKV7qW9FY5cCJUu3i74Qu2+qMdcX1n49RhgGk4yLKEgrDaNn0+pGmgLjLRi\nPfDfxW6o1QKBgBFgtP2whKDjO9UpnYj0DNyop+jL4eCBBXWgbjkHt5WvNZcEAs5n\nR4f8JbemmxV9KubTArklcQ3rMVW8+cU4nMKpWN4xvfDiAFblfqe12iQRnl4uybRy\nCOucEzIwhTzgsF1mlCvkfir9w7UeZrSrRafrbDw1r31yT4v4KKKbz+k3AoGASyfC\nTj70rBCvTFkgPhM3/x3cEHSfUHV4PG392fLPWxLvBXshMqr/bQU31ZmiK11w3g02\nne/gAiAiSQFXzv0H8C9z/uCnuafWLklhQjU4nyhj1fEuIU+DYOmjzfoMOOUz4xqx\nKcFDxHNKHotwjm7z8TIWhr3SV5Xk+lej5ShsbzUCgYEAxJ1p8LLOwnJhB675o5wu\nVdLphwPu4lDA3YotuSdLf5b1K59nNN6OhynTzu4tw/TqGrzJFwzCrLK1o93077DF\nUQYm5hzxcTTKyXu+jgBnzCC9uix1a/wy2nBbxgYzZ5QyUMXYAwIg178k6k1CVRn2\nahIfmPd5R8ntWjQsl6dIUq8=\n-----END PRIVATE KEY-----\n"
+                  user: 'tunjimikel@gmail.com',
+                  pass: 'Layanhova@17'
                 },
                 tls: {
                   rejectUnauthorized: false
                 }
-
+            
               });
+            
 
 
               console.log(token);
+              console.log(data[0].email);
               var mailOptions = {
 
-                to: data[0].Email,
-                from: 'tjlayan20@gmail.com',
+                to: data[0].email,
+                from: 'tunjimikel@gmail.com',
                 subject: 'PartiFest Password Reset',
                 text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
                   'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
@@ -2862,14 +3158,20 @@ router.post('/forget-password', function (req, res, next) {
 
 // reset token
 router.get('/reset/:token', function (req, res) {
-  db.query('select * from register where resetpasswordtoken = ? ', [req.params.token], function (err, data) {
-    console.log(data);
-    if (!data.length) {
+  var fname = "";
+  var lname = "";
+  db.query('select * from customer where resetpasswordtoken = ?; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 1; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 2; SELECT * FROM stock join gender on gender.gender_id = stock.gender_id join product_type on stock.p_type_id = product_type.p_type_id where gender.gender_id = 3; ', [req.params.token], function (err, data) {
+    console.log(data[0]);
+    if (!data[0].length) {
       req.flash('error', 'Password reset link is invalid.');
       res.redirect('/forget-password');
     }
     else {
-      res.render('reset', { token: req.params.token });
+      if(req.user) {
+        fname = req.user.fname;
+        lname= req.user.lname;
+        }
+        res.render('reset', { men:data[1], women:data[2], kid:data[3],  lname:lname, fname:fname, token: req.params.token})
     }
   });
 });
@@ -2903,7 +3205,7 @@ router.post('/reset/:token', function (req, res) {
       //set pass to hash;
       let password = hash;
 
-      db.query("update register set password = ?  where resetpasswordtoken = ?",
+      db.query("update customer set password = ?  where resetpasswordtoken = ?",
         [password, req.params.token], function (err, rs) {
           if (err) {
             res.send('not inserted buddy')

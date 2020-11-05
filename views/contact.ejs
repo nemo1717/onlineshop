@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body {font-family: Arial, Helvetica, sans-serif;}
+* {box-sizing: border-box;}
+
+input[type=text], select, textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  resize: vertical;
+}
+
+input[type=submit] {
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+.containers {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+}
+</style>
+
+
+<body>
+
+    <%if (lname) { %>
+        <% include ./navis %>
+      <% } %>
+    
+     <%if (!lname) { %>
+      <% include ./navi %>
+     <% } %>
+
+     <br>
+     <br>
+     
+     <% include ./partials/messages %>
+                              
+     <% if ( success_messages !='' ) { %>
+       <div class="alert alert-success" >
+           <strong><%= success_messages %> </strong>
+       </div>
+       <% } %>
+
+<div class="containers">
+  <form action="/contact" method="POST">
+    <label for="fname">First Name</label>
+    <input type="text" id="fname" name="firstname" placeholder="Your name..">
+
+    <label for="lname">Last Name</label>
+    <input type="text" id="lname" name="lastname" placeholder="Your last name..">
+
+    <label for="email">Email</label>
+    <input type="text" id="email" name="email" placeholder="Your email..">
+
+    <label for="phone">Phone Number</label>
+    <input type="text" id="phone" name="phone" placeholder="Your phone number..">
+
+    <label for="topic">Topic</label>
+    <input  type="text" id="topic" maxlength = "200" name="topic" placeholder="Your topic for contacting..">
+
+    
+
+
+<!--
+    <label for="country">Country</label>
+    <select id="country" name="country">
+      <option value="australia">Australia</option>
+      <option value="canada">Canada</option>
+      <option value="usa">USA</option>
+    </select>
+
+    -->
+
+    <label for="subject">Subject</label>
+    <textarea id="subject" name="subject" placeholder="Write something.." style="height:200px"></textarea>
+
+    <input type="submit" value="Submit">
+  </form>
+</div>
+<br>
+<br>
+
+<section style="background-color: rgb(27, 27, 27);" id="contact">
+    <div  class="container">
+        <a href="#"><h4 style="margin: 0;">cantact us</h4></a>
+        <p style="margin: 0;">451 awenve 5th street new york city</p>
+        <p style="margin: 0;">+ (42) 442 4521</p>
+        <p style="margin: 0;">info.fashion@gmail.com</p>
+        
+<a  href="#" ><h4>Read About us</h4></a>
+</div>
+</section>
+<footer>
+    <p class="copy-right"><img src="https://res.cloudinary.com/de8cuyd0n/image/upload/v1520412543/E-commerce%20landing%20page/icons/copy-right-img_1x.png" alt="copy right image" /> 2017 all right recived </p>
+    <p>privacy policy</p>
+    <p>license</p>
+</footer>
+</body>
+</html>

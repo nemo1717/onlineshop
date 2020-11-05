@@ -10,7 +10,7 @@
     margin: 20px 20px 0 0;  
     border: 1px solid #333;
     overflow: auto;
-    background-color: rgb(248, 248, 248);
+    background-color: rgb(253, 253, 253);
 }
 .post-thumb {
     float: left
@@ -19,7 +19,7 @@
     display: block;
     overflow: hidden;
     width: 150px;
-    height: 210px;
+    height: 180px;
 }
 .post-content {
     margin-left: 160px
@@ -28,7 +28,7 @@
 .post-content p {
     margin-bottom: 1px;
     font-family:Arial, Helvetica, sans-serif;
-    font-size: 13px;
+    font-size: 13.5px;
 }
 
 .post-title {
@@ -37,45 +37,46 @@
     margin-top: 14px;
 }
 
+.post-content span {
+    font-weight: bold;
+    font-size: 13.5px;
+    
+}
 
 </style>
 
 <% include ./navis %>
-<body>
 
+<body>
 <%if (customer == 'buyer') { %>
     <% data.forEach(function(item) { %>
-        <%if (item.shipping_status == 'unshipped') { %>
+        <%if (item.shipping_status == 'unshipped'){%>
             <div class="post-container">                
                 <div class="post-thumb"><img src="/<%= item.image1 %>" /></div>
                 <div class="post-content">
                     <h6 class="post-title"><%= item.prod_name %></h6>
-                    <p><span>Price:</span> <%= item.price %></p>
-                    <p><span >Date Purchased:</span> <%= moment(item.date).format("ll") %></p>
+                    <p><span>Price: </span><span  style="color: #1d1c1b;">&#8358;</span><%=item.price %></p>
+                    <p><span >Date Purchased: </span><%= moment(item.date).format("ll") %></p>
                     <p  style="color: red; font-weight: bold;"><%= item.shipping_status %></p>
                 </div>       
             </div>
-        <% } %>
-        
+        <% } %>      
 
         <%if (item.shipping_status == 'shipped' ) { %>
            <div class="post-container">                
             <div class="post-thumb"><img src="/<%= item.image1 %>" /></div>
             <div class="post-content">
                 <h6 class="post-title"><%= item.prod_name %></h6>
-                <p><span>Price:</span> <%= item.price %></p>
-                <p><span >Date Purchased:</span> <%= moment(item.date).format("ll") %></p>
-                <a><p><span >Tracking Number:</span> <%= item.tracking_number %></p></a>
-                <a><p><span >Shipping Company:</span> <%= item.shipping_company%></p></a>
-
+                <p><span>Price: </span><span  style="color: #1d1c1b;">&#8358;</span><%= item.price %></p>
+                <p><span >Date Purchased: </span> <%= moment(item.date).format("ll") %></p>
+                <a><p><span >Tracking Number: </span> <%= item.tracking_number %></p></a>
+                <a><p><span >Shipping Company: </span> <%= item.shipping_company%></p></a>
                 <p  style="color: green; font-weight: bold;"><%= item.shipping_status %></p>
             </div>       
             </div>
         <% } %>
     <% }); %>  
 <% } %>
-
-
 
 <%if (customer == 'seller') { %>
     <% seller.forEach(function(item) { %>
@@ -84,8 +85,8 @@
                 <div class="post-thumb"><img src="/<%= item.image1 %>" /></div>
                 <div class="post-content">
                     <h6 class="post-title"><%= item.prod_name %></h6>
-                    <p><span>Price:</span> <%= item.price %></p>
-                    <p><span >Date Purchased:</span> <%= moment(item.date).format("ll") %></p>
+                    <p><span>Price: </span><span  style="color: #1d1c1b;">&#8358;</span><%= item.price %></p>
+                    <p><span >Date Purchased: </span> <%= moment(item.date).format("ll") %></p>
                     <a href="/tracking-number/<%= item.order_detail_id %>" ><p>Add Tracking Number</p></a>
                     <p  style="color: red; font-weight: bold;"><%= item.shipping_status %></p>
                 </div>       
@@ -97,18 +98,33 @@
             <div class="post-thumb"><img src="/<%= item.image1 %>" /></div>
             <div class="post-content">
                 <h6 class="post-title"><%= item.prod_name %></h6>
-                <p><span>Price:</span> <%= item.price %></p>
-                <p><span >Date Purchased:</span> <%= moment(item.date).format("ll") %></p>
-                <a><p><span >Tracking Number:</span> <%= item.tracking_number %></p></a>
-                <a><p><span >Shipping Company:</span> <%= item.shipping_company%></p></a>
-
+                <p><span>Price: </span><span  style="color: #1d1c1b;">&#8358;</span><%= item.price %></p>
+                <p><span >Date Purchased: </span> <%= moment(item.date).format("ll") %></p>
+                <a><p><span >Tracking Number: </span> <%= item.tracking_number %></p></a>
+                <a><p><span >Shipping Company: </span> <%= item.shipping_company%></p></a>
                 <p  style="color: green; font-weight: bold;"><%= item.shipping_status %></p>
             </div>       
         </div>
         <% } %>
-    
     <% }); %>  
 <% } %>
-    
+<br>
+<br>
+<br>
+<section style="background-color: rgb(27, 27, 27);" id="contact">
+    <div  class="container">
+        <a href="#"><h4 style="margin: 0;">cantact us</h4></a>
+        <p style="margin: 0;">451 awenve 5th street new york city</p>
+        <p style="margin: 0;">+ (42) 442 4521</p>
+        <p style="margin: 0;">info.fashion@gmail.com</p>
+        
+<a  href="#" ><h4>Read About us</h4></a>
+</div>
+</section>
+<footer>
+    <p class="copy-right"><img src="https://res.cloudinary.com/de8cuyd0n/image/upload/v1520412543/E-commerce%20landing%20page/icons/copy-right-img_1x.png" alt="copy right image" /> 2020 all right recived </p>
+    <p>privacy policy</p>
+    <p>license</p>
+</footer>
 </body>
 </html>

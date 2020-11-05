@@ -173,6 +173,13 @@ header nav .nav-icon {
 	padding: 0.8rem;
 }
 
+.nav-item {
+
+	font-size: 16px;
+	
+
+}
+
 #header-hero .header-content .button p {
 	font-family: Cambria;
 	font-size: 1rem;
@@ -1293,7 +1300,7 @@ footer .copy-right {
 
 
 			<nav  class="navbar navbar-expand-lg navbar-dark bg-dark">
-				<a class="navbar-brand" href="#" style="color: goldenrod;"><h5>Welcome</h5></a>
+				<a class="navbar-brand" href="/myaccount" style="color: goldenrod;"><h5>Welcome</h5></a>
 				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 				  <span class="navbar-toggler-icon"></span>
 				</button>
@@ -1315,7 +1322,7 @@ footer .copy-right {
 			  </nav>
     
 			<nav class="navbar navbar-expand-lg navbar-light bg-light">
-				<a class="navbar-brand" href="#">Navbar</a>
+				<a class="navbar-brand" href="/myaccount">Navbar</a>
 		
 			  
 				<div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -1387,9 +1394,14 @@ footer .copy-right {
 					  
 					  </li>
 
-					  					  <!-- Product Features for Employee-->
+
+					  
+
+											<!-- Product Features for Employee-->
+											
+					 <%if (status == 'seller') { %>
 					  <li class="nav-item active">
-						<a  style="margin-right: 6px;" class="nav-link" href="/add_product">Add Product<span class="sr-only">(current)</span></a>
+						<a  style="margin-right: 6px; " class="nav-link" href="/add_product">Add Product<span class="sr-only">(current)</span></a>
 					  </li>
 
 					  <li class="nav-item dropdown">
@@ -1414,6 +1426,7 @@ footer .copy-right {
 						-->
 						</div>
 					  </li>
+					  <% } %>
 					  
 
 				  </ul>
@@ -1470,11 +1483,21 @@ footer .copy-right {
 								  </div>
 								  <div class="product-content">
 									<h3 class="title"><a href="/details/<%= item.stock_id %>"><%= item.prod_name %></a></h3>
+									<div class="price"><span  style="color: #1d1c1b;">&#8358;</span><%= item.price %>
+									<!--
 									<div class="price"><%= item.price %>
 										<span><%= item.price %></span>
-									</div>
-									<a class="add-to-cart" href="/details/<%= item.stock_id %>" >+ Check It Out</a>
-								</div>
+										-->
+										<%if ( item.quantity != 0 ) { %>
+										</div>
+										  <a class="add-to-cart" href="/addcart/<%= item.stock_id %>" >+ Add To Cart</a>
+										</div>
+									  <% } %>
+									  <%if ( item.quantity == 0 ) { %>
+										</div>
+										  <a class="add-to-cart"  >Out of Stock</a>
+										</div>
+									  <% } %>
 							  </div>
 							</div>  
 								<% }); %>        
@@ -1501,7 +1524,7 @@ footer .copy-right {
 
 			<section id="contact">
                 <div class="container">
-                    <a href="#"><h4 style="margin: 0;">cantact us</h4></a>
+                    <a href="/contact"><h4 style="margin: 0;">cantact us</h4></a>
                     <p style="margin: 0;">451 awenve 5th street new york city</p>
                     <p style="margin: 0;">+ (42) 442 4521</p>
                     <p style="margin: 0;">info.fashion@gmail.com</p>
@@ -1510,7 +1533,7 @@ footer .copy-right {
 				</div>
             </section>
             <footer>
-                <p class="copy-right"><img src="https://res.cloudinary.com/de8cuyd0n/image/upload/v1520412543/E-commerce%20landing%20page/icons/copy-right-img_1x.png" alt="copy right image" /> 2017 all right recived </p>
+                <p class="copy-right"><img src="https://res.cloudinary.com/de8cuyd0n/image/upload/v1520412543/E-commerce%20landing%20page/icons/copy-right-img_1x.png" alt="copy right image" /> 2020 all right recived </p>
                 <p>privacy policy</p>
                 <p>license</p>
             </footer>

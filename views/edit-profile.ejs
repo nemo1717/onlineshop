@@ -72,7 +72,7 @@
 
   <body id="bodys">
 
-    <% include ./navi %>
+    <% include ./navis %>
 
     <div class="section-form">
       <% include ./partials/messages %>
@@ -83,26 +83,27 @@
         </div>
         <% } %>
     
-            <form  action="/login" method="post">
+            <form  action="/edit-profile" method="post">
               <div class="intro"> 
                 <!--
                 <h1><span style="float: left;" >ttttttt</span>Register</h1>-->
-                <h1 style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; font-size: 18px;">Login</h1>
-                
-                <input type="email" value="" placeholder="Email" name="email" tabindex="2" required/>
-                <input type="password" value="" placeholder="Password  " name="password" tabindex="3" required/>
-             
-                <p class="lead mt-4"><h5>Forget Password? <a style="color: rgb(61, 185, 50);" href="/forget-password">Reset Password</a></h5></p> 
-                <p class="lead mt-4"><h5>Dont have an account? <a style="color: rgb(61, 185, 50);" href="/register">Register</a></h5></p>
-           
+                <h1 style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; font-size: 18px;">Edit Profile</h1>
+                <% data.forEach(function(item) { %>  
+             <input type="text" id="fname" value="<%= item.fname %>" placeholder="First Name" name="fname" tabindex="1" required/>
+              <input type="text" id="lname" value="<%= item.lname %>" placeholder="Last Name " name="lname" tabindex="2" required/>
+              <input type="text" id="addy" value="<%= item.address %>" placeholder="Address " name="addy" tabindex="3" required/>
+              <input type="text" id="city" value="<%= item.city %>" placeholder="City" name="city" tabindex="5" required/>
+              <input type="text" id="state" value="<%= item.state %>" placeholder="State" name="state" tabindex="7" required/>
+              <input type="text" id="country" value="<%= item.country %>" placeholder="Country" name="country" tabindex="7" required/>
+              <input type="text" id="phone" value="<%= item.phone %>" placeholder="Phone Number " name="phone" tabindex="8" required/>
+              <input type="email" id="email" value="<%= item.email %>" placeholder="Email" name="email" tabindex="9" required/>
+              <% }); %> 
 
               <button id="register" type="submit" style="background-color: green;"  class="btn btn-primary btn-block">Submit</button>
-            </div>
             </form>
-      
+          </div>
             </main>
         </div>
-        
 
 
 <!-- Disable login if necessary
@@ -123,12 +124,29 @@ function allFilled() {
 </script>
 
 -->
-<br>
 
-<footer style="background-color:#595959; margin-top: 30px; width: 100%; ">
-    <p class="copy-right"><img src="https://res.cloudinary.com/de8cuyd0n/image/upload/v1520412543/E-commerce%20landing%20page/icons/copy-right-img_1x.png" alt="copy right image" /> 2020 all right recived </p>
-  
-  </footer>
+   
+
+   
+
+</br>
+
+
+<section style="background-color: rgb(27, 27, 27);" id="contact">
+    <div  class="container">
+        <a href="#"><h4 style="margin: 0;">cantact us</h4></a>
+        <p style="margin: 0;">451 awenve 5th street new york city</p>
+        <p style="margin: 0;">+ (42) 442 4521</p>
+        <p style="margin: 0;">info.fashion@gmail.com</p>
+        
+<a  href="#" ><h4>Read About us</h4></a>
+</div>
+</section>
+<footer>
+    <p class="copy-right"><img src="https://res.cloudinary.com/de8cuyd0n/image/upload/v1520412543/E-commerce%20landing%20page/icons/copy-right-img_1x.png" alt="copy right image" /> 2017 all right recived </p>
+    <p>privacy policy</p>
+    <p>license</p>
+</footer>
 
 </body>
 </html>
