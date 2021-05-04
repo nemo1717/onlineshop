@@ -3,14 +3,13 @@ var mysql = require('mysql');
 var bcrypt = require('bcryptjs');
 var nodemailer = require('nodemailer');
 
+// Mysql connectionString
 var mysql = require('mysql');
 var db = mysql.createPool({
-  host: 'sodiq-enterprises.c56ky9ttj1zp.us-east-2.rds.amazonaws.com',
-  user: 'root',
-  password: 'Bestlayan17',
-  database: 'sodiq_business',
-  multipleStatements: true
-
+  host: 'XXXXXXXXX',
+  user: 'XXXX',
+  password: 'XXXXX',
+  database: 'XXXXXXX',
 });
 
 module.exports = function(passport) {
