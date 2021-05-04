@@ -23,22 +23,13 @@ const { promisify } = require('util');
 
 // Mysql connectionString
 var mysql = require('mysql');
-const { connected } = require('process');
 var db = mysql.createPool({
-  host: 'sodiq-enterprises.c56ky9ttj1zp.us-east-2.rds.amazonaws.com',
-  user: 'root',
-  password: 'Bestlayan17',
-  database: 'sodiq_business',
-  multipleStatements: true
+  host: 'XXXXXXXXX',
+  user: 'XXXX',
+  password: 'XXXXX',
+  database: 'XXXXXXX',
 
 });
-
- // var SEC_KEY = "FLWSECK_TEST-a561248cfe957b17d837355087faeca4-X";
-
-
- 
- 
-
 
 
 http.createServer(function (req, res) {
